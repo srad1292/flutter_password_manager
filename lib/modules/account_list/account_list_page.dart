@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/size_config.dart';
 
+import '../password_form.dart';
+
 class AccountListPage extends StatefulWidget {
   @override
   _AccountListPageState createState() => _AccountListPageState();
@@ -42,7 +44,15 @@ class _AccountListPageState extends State<AccountListPage> {
               Icons.add,
               size: 9 * SizeConfig.widthMultiplier,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return PasswordForm();
+                }),
+              );
+
+              //TODO refresh the list
+            },
           ),
         )
       ) 
