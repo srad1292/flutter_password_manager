@@ -5,8 +5,12 @@ class Password {
   String username;
   String password;
   bool isSecret;
+  bool isSuper;
 
-  Password({this.id, this.accountName = '', this.email = '', this.username = '', this.password = '', this.isSecret=false});
+  Password({
+    this.id, this.accountName = '', this.email = '', this.username = '',
+    this.password = '', this.isSecret=false, this.isSuper=false
+  });
 
   Map<String, dynamic> toPersistence() =>
   {
@@ -15,7 +19,8 @@ class Password {
     'email': this.email,
     'username': this.username,
     'password': this.password,
-    'is_active': this.isSecret == true ? 1 : 0,
+    'is_secret': this.isSecret == true ? 1 : 0,
+    'is_super': this.isSuper == true ? 1 : 0,
   };
 
   factory Password.fromPersistence(Map<String, dynamic> json) {
@@ -26,6 +31,7 @@ class Password {
       username: json['username'],
       password: json['password'],
       isSecret: json['is_secret'] == 1 ? true : false,
+      isSuper: json['is_super'] == 1 ? true : false,
     );
   }
 
@@ -33,11 +39,13 @@ class Password {
   String toString() {
     return '''
     (
+      id: ${this.id}, 
       accountName: ${this.accountName}, 
       email: ${this.email}, 
       username: ${this.username}, 
       password: ${this.password}, 
       isSecret: ${this.isSecret}, 
+      isSuper: ${this.isSecret}, 
     )''';
   }
 }

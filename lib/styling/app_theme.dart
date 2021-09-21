@@ -34,13 +34,18 @@ class AppTheme {
     backgroundColor: appBarLight,
     foregroundColor: Colors.white,
     centerTitle: true,
-    textTheme: lightTextTheme
+    textTheme: lightTextTheme,
+    iconTheme: barIconThemeLight,
   );
 
   static final AppBarTheme appBarThemeDark = AppBarTheme(
     backgroundColor: appBarDark,
     foregroundColor: Colors.black87,
     centerTitle: true
+  );
+
+  static final IconThemeData barIconThemeLight = IconThemeData(
+    color: Colors.black87
   );
 
   static final TextTheme lightTextTheme = TextTheme(

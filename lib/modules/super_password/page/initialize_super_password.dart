@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/account_list/account_list_page.dart';
-import 'package:password_manager/styling/app_theme.dart';
-import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/size_config.dart';
 
 class InitializeSuperPassword extends StatefulWidget {

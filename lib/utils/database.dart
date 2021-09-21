@@ -39,7 +39,8 @@ class DBProvider {
       "email TEXT,"
       "username TEXT,"
       "password TEXT,"
-      "is_secret INTEGER default 1"
+      "is_secret INTEGER default 0,"
+      "is_super INTEGER default 0"
       ");";
   }
 

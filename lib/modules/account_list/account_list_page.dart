@@ -31,6 +31,7 @@ class _AccountListPageState extends State<AccountListPage> {
           appBar: AppBar(
             title: Text("Passwords")
           ),
+          drawer: _buildAccountListDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             child: _buildPasswordScreen()
@@ -41,9 +42,58 @@ class _AccountListPageState extends State<AccountListPage> {
               Icons.add,
               size: 9 * SizeConfig.widthMultiplier,
             ),
+            onPressed: () {},
           ),
         )
       ) 
+    );
+  }
+
+  Widget _buildAccountListDrawer() {
+    return Drawer(
+      // Add a ListView to the drawer. This ensures the user can scroll
+      // through the options in the drawer if there isn't enough vertical
+      // space to fit everything.
+      child: ListView(
+        // Important: Remove any padding from the ListView.
+        padding: EdgeInsets.zero,
+        children: [
+          ListTile(
+            title: Text("Menu", style: Theme.of(context).textTheme.headline6,),
+            tileColor: Colors.lightBlueAccent,
+          ),
+          ListTile(
+            title: const Text('Import'),
+            trailing: Icon(Icons.vertical_align_top),
+            onTap: () {
+              //TODO Add import functionality
+              // Note this makes me wonder about what if you import with duplicate ids
+              // should the import overwrite existing data.  I think in my head I decided that
+              // earlier but I need to think about it.
+              print("Import coming soon");
+            },
+          ),
+          Divider(thickness: 2,),
+          ListTile(
+            title: const Text('Export'),
+            trailing: Icon(Icons.vertical_align_bottom),
+            onTap: () {
+              //TODO Add export functionality
+              print("Export coming soon");
+            },
+          ),
+          Divider(thickness: 2,),
+          ListTile(
+            title: const Text('Settings'),
+            trailing: Icon(Icons.settings),
+            onTap: () {
+              //TODO Link to user settings
+              print("User settings coming soon");
+            },
+          ),
+          Divider(thickness: 2,),
+        ],
+      ),
     );
   }
   
@@ -90,12 +140,7 @@ class _AccountListPageState extends State<AccountListPage> {
       controller: _passwordSearchController,
       decoration: InputDecoration(
         hintText: "Search Application",
-        suffixIcon: IconButton(
-          icon: Icon(Icons.search),
-          color: Colors.black45,
-          focusColor: Colors.black45,
-          disabledColor: Colors.black45,
-        )
+        suffixIcon: Icon(Icons.search, color: Colors.black45),
       ),
     );
   }
