@@ -12,6 +12,16 @@ class Password {
     this.password = '', this.isSecret=false, this.isSuper=false
   });
 
+  Password.clone(Password password) {
+    this.id = password.id;
+    this.accountName = password.accountName;
+    this.email = password.email;
+    this.username = password.username;
+    this.password = password.password;
+    this.isSecret = password.isSecret;
+    this.isSuper = password.isSuper;
+  }
+
   Map<String, dynamic> toPersistence() =>
   {
     'id': this.id,

@@ -34,7 +34,7 @@ class DBProvider {
 
   String _getUserSchema() {
     return "CREATE TABLE password ("
-      "id INTEGER PRIMARY KEY"
+      "id INTEGER PRIMARY KEY,"
       "account_name TEXT,"
       "email TEXT,"
       "username TEXT,"

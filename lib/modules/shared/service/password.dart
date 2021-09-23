@@ -16,8 +16,8 @@ class PasswordService {
     this._passwordDao = new PasswordDao();
   }
 
-  Future<List<Password>> getPasswordsFromPersistence({String accountSearch = ''}) async {
-    return await this._passwordDao.getAllPasswords(accountSearch: accountSearch);
+  Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = ''}) async {
+    return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
   }
 
   Future<Password> getPasswordById({int passwordId = 0}) async {
@@ -26,7 +26,8 @@ class PasswordService {
 
   Future<Password> createPassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
-    if(id != 0) {
+    print("Create password ID: $id");
+    if(id != null && id != 0) {
       password.id = id;
     }
     return password;
@@ -34,6 +35,7 @@ class PasswordService {
 
   Future<Password> updatePassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
+    print("Update password ID: $id");
     if(id != 0) {
       password.id = id;
     }

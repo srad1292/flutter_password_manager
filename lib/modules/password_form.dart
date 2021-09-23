@@ -65,6 +65,7 @@ class _PasswordFormState extends State<PasswordForm> {
       child: Column(
         children: [
           ..._buildFormFields(),
+          _buildSubmitButton()
         ],
       ),
     );
@@ -76,11 +77,12 @@ class _PasswordFormState extends State<PasswordForm> {
       _buildEmailField(),
       _buildUsernameField(),
       _buildPasswordField(),
-      _buildSubmitButton()
+      _buildIsSecretField()
     ];
   }
 
   Widget _buildAccountNameField() {
+    //Todo : keyboard causing account name label to squish
     return Padding(
       padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
       child: TextField(
@@ -156,10 +158,42 @@ class _PasswordFormState extends State<PasswordForm> {
     );
   }
 
+  Widget _buildIsSecretField() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+      child: CheckboxListTile(
+        contentPadding: EdgeInsets.only(left: 0),
+        title: Text("Secret Account?"),
+        controlAffinity: ListTileControlAffinity.leading,
+        value: _isSecret,
+        onChanged: (bool value) {
+          setState(() {
+            _isSecret = value;
+          });
+        },
+        activeColor: Colors.lightBlue,
+        checkColor: Colors.black45,
+      ),
+    );
+  }
+
   Widget _buildSubmitButton() {
     return ElevatedButton(
-      onPressed: () {
-        print("Hit the save button!");
+      onPressed: () async {
+        Password password = new Password(
+          id: widget?.password?.id,
+          accountName: _accountNameController.text,
+          email: _emailController.text,
+          username: _usernameController.text,
+          password: _passwordController.text,
+          isSecret: _isSecret
+        );
+
+        Function saveFunction = widget?.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
+
+        await saveFunction(password);
+
+        Navigator.of(context).pop();
       },
       child: Text("Save Password"),
     );

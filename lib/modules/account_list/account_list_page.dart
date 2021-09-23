@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:password_manager/styling/colors.dart';
+import 'package:password_manager/modules/settings/password_action.dart';
+import 'package:password_manager/modules/shared/model/password.dart';
+import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
 import '../password_form.dart';
@@ -10,16 +13,41 @@ class AccountListPage extends StatefulWidget {
 }
 
 class _AccountListPageState extends State<AccountListPage> {
-  final items = List<String>.generate(20, (i) => "Item $i");
-  // final items = List<String>.generate(0, (i) => "Item $i");
+  PasswordService _passwordService;
+  List<Password> _passwords;
   TextEditingController _passwordSearchController;
   bool _showHidden = false;
+  bool _loading;
 
   @override
   void initState() {
     super.initState();
-
+    _loading = true;
+    _passwordService = serviceLocator.get<PasswordService>();
     _passwordSearchController = new TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadPasswords("").then((_) {
+        setState(() {
+          _loading = false;
+        });
+      });
+    });
+  }
+
+  Future<void> _loadPasswords(String accountSearch) async {
+    try {
+      List<Password> dbPasswords = await this._passwordService.getPasswordsFromPersistence(
+        showSecret: _showHidden,
+        accountSearch: accountSearch
+      );
+      setState(() {
+        _passwords = dbPasswords;
+      });
+    } catch(error) {
+      print("error loading passwords");
+      print(error);
+    }
   }
 
   @override
@@ -27,7 +55,10 @@ class _AccountListPageState extends State<AccountListPage> {
     return SafeArea(
       child: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          final FocusScopeNode currentScope = FocusScope.of(context);
+          if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
+            FocusManager.instance.primaryFocus.unfocus();
+          }
         },
         child: Scaffold(
           appBar: AppBar(
@@ -36,7 +67,7 @@ class _AccountListPageState extends State<AccountListPage> {
           drawer: _buildAccountListDrawer(),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-            child: _buildPasswordScreen()
+            child: _loading ? _buildScreenLoading() : _buildPasswordScreen()
           ),
           resizeToAvoidBottomInset: false,
           floatingActionButton: FloatingActionButton(
@@ -51,21 +82,17 @@ class _AccountListPageState extends State<AccountListPage> {
                 }),
               );
 
-              //TODO refresh the list
+              await this._loadPasswords(_passwordSearchController.text ?? '');
             },
           ),
         )
-      ) 
+      )
     );
   }
 
   Widget _buildAccountListDrawer() {
     return Drawer(
-      // Add a ListView to the drawer. This ensures the user can scroll
-      // through the options in the drawer if there isn't enough vertical
-      // space to fit everything.
       child: ListView(
-        // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: [
           ListTile(
@@ -106,9 +133,20 @@ class _AccountListPageState extends State<AccountListPage> {
       ),
     );
   }
+
+  Widget _buildScreenLoading() {
+    return Center(
+      child: Column(
+        children: [
+          Text("Loading..."),
+          CircularProgressIndicator()
+        ]
+      )
+    );
+  }
   
   Widget _buildPasswordScreen() {
-    if((items ?? []).length == 0) {
+    if((_passwords ?? []).length == 0) {
       return _buildEmptyListScreen();
     } else {
       return _buildHasPasswordScreen();
@@ -146,11 +184,14 @@ class _AccountListPageState extends State<AccountListPage> {
   }
   
   Widget _buildPasswordSearch() {
-    return TextField(
-      controller: _passwordSearchController,
-      decoration: InputDecoration(
-        hintText: "Search Application",
-        suffixIcon: Icon(Icons.search, color: Colors.black45),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 2.5 * SizeConfig.widthMultiplier),
+      child: TextField(
+        controller: _passwordSearchController,
+        decoration: InputDecoration(
+          hintText: "Search Application",
+          suffixIcon: Icon(Icons.search, color: Colors.black45),
+        ),
       ),
     );
   }
@@ -161,7 +202,7 @@ class _AccountListPageState extends State<AccountListPage> {
       child: Row(
         children: [
           Text(
-              "Show Hidden?",
+              "Show Secret Passwords?",
               style: Theme.of(context).textTheme.subtitle2
           ),
           Switch(
@@ -170,6 +211,7 @@ class _AccountListPageState extends State<AccountListPage> {
               setState(() {
                 _showHidden = newValue;
               });
+              this._loadPasswords(_passwordSearchController.text);
             },
             activeColor: Colors.blueAccent,
             activeTrackColor: Colors.lightBlueAccent,
@@ -183,11 +225,18 @@ class _AccountListPageState extends State<AccountListPage> {
   
   Widget _buildPasswordList() {
     return ListView.separated(
-      itemCount: items.length,
+      itemCount: _passwords.length,
       itemBuilder: (context, index) {
+        Password password = _passwords[index];
+        String subtitle = (password.email ?? '').isEmpty ? password.username : password.email;
+
         return ListTile(
-          title: Text(items[index]),
-          subtitle: Text("smr1292@gmail.com"),
+          title: Text(password.accountName),
+          subtitle: Text(subtitle),
+          trailing: password.isSecret ? Icon(Icons.visibility_off) : null,
+          onTap: () {
+            _showPasswordPressedDialog(password);
+          },
         );
       },
       separatorBuilder: (context, index) {
@@ -196,5 +245,71 @@ class _AccountListPageState extends State<AccountListPage> {
         );
       },
     );
+  }
+
+  void _showPasswordPressedDialog(Password password) async {
+
+    SimpleDialog passwordDialog = new SimpleDialog(
+      title: Text(password.accountName),
+      children: <Widget>[
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.of(context).pop(PasswordAction.view);
+          },
+          child: Row(
+            children: [
+              Icon(Icons.read_more),
+              Text("View Details")
+            ],
+          )
+        ),
+        SimpleDialogOption(
+            onPressed: () {
+              Navigator.of(context).pop(PasswordAction.edit);
+            },
+            child: Row(
+              children: [
+                Icon(Icons.edit),
+                Text("Edit Password")
+              ],
+            )
+        ),
+        SimpleDialogOption(
+            onPressed: () {
+              Navigator.of(context).pop(PasswordAction.delete);
+            },
+            child: Row(
+              children: [
+                Icon(Icons.delete_forever),
+                Text("Delete Password")
+              ],
+            )
+        ),
+      ],
+    );
+
+    PasswordAction result = await showDialog<PasswordAction>(
+      context: context,
+      builder: (_) => passwordDialog
+    );
+
+    if(result == null) return;
+
+    if(result == PasswordAction.view) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("View details coming soon"))
+      );
+    } else if(result == PasswordAction.edit) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) {
+          return PasswordForm(password: new Password.clone(password));
+        }),
+      );
+      this._loadPasswords(_passwordSearchController.text);
+    } else if(result == PasswordAction.delete) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Delete coming soon"))
+      );
+    }
   }
 }

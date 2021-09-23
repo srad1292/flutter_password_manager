@@ -39,10 +39,14 @@ class PasswordDao {
     return null;
   }
 
-  Future<List<Password>> getAllPasswords({String accountSearch = ''}) async {
+  Future<List<Password>> getAllPasswords({bool showSecret = false, String accountSearch = ''}) async {
     Database db = await DBProvider.db.database;
     try {
-      List<Map<String, dynamic>> dbPasswords = await db.query("password", where: "account_name like %?%", whereArgs: [accountSearch.toLowerCase()]);
+      List<Map<String, dynamic>> dbPasswords = await db.query(
+        "password",
+        where: showSecret ? "account_name like ?" : "is_secret = ? and account_name like ?",
+        whereArgs: showSecret ? ["%${accountSearch.toLowerCase()}%"] : [0, "%${accountSearch.toLowerCase()}%"]
+      );
       if(dbPasswords != null && dbPasswords.length > 0) {
         return List.generate(dbPasswords.length, (index) {
           return Password.fromPersistence(dbPasswords[index]);
