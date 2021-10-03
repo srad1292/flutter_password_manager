@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
+import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/utils/service_locator.dart';
@@ -125,8 +126,11 @@ class _AccountListPageState extends State<AccountListPage> {
             title: const Text('Settings'),
             trailing: Icon(Icons.settings),
             onTap: () {
-              //TODO Link to user settings
-              print("User settings coming soon");
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return SettingsPage();
+                })
+              );
             },
           ),
           Divider(thickness: 2,),
@@ -358,9 +362,6 @@ class _AccountListPageState extends State<AccountListPage> {
   }
 
   void _showPasswordDetailsDialog(Password password) async {
-    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    var containerWidthMultiplier = isPortrait ?  0.9 : 0.45;
-
     SimpleDialog passwordDetailsDialog = new SimpleDialog(
       contentPadding: EdgeInsets.fromLTRB(24, 24, 0, 16),
       titlePadding: EdgeInsets.fromLTRB(32, 24, 32, 8),
@@ -374,7 +375,6 @@ class _AccountListPageState extends State<AccountListPage> {
         textAlign: TextAlign.center,
       ),
       children: <Widget>[
-        // Container(width: containerWidthMultiplier * MediaQuery.of(context).size.width),
         Container(
           margin: EdgeInsets.only(bottom: 2.5 * SizeConfig.heightMultiplier),
           child: Column(
