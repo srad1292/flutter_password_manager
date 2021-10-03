@@ -53,6 +53,7 @@ class AppTheme {
     // headline4: _greetingLight,
     // headline3: _searchLight,
     subtitle1: _subTitleLight,
+    subtitle2: _subTitle2Light,
     bodyText2: _basicTextLight,
     // bodyText1: _unSelectedTabLight,
     // button: _buttonLight,
@@ -77,6 +78,12 @@ class AppTheme {
     color: Colors.black87,
     fontSize: 2 * SizeConfig.textMultiplier,
     fontWeight: FontWeight.w400
+  );
+
+  static final TextStyle _subTitle2Light = TextStyle(
+      color: Colors.black87,
+      fontSize: 1.5 * SizeConfig.textMultiplier,
+      fontWeight: FontWeight.w600
   );
 
   static final TextStyle _buttonLight = TextStyle(

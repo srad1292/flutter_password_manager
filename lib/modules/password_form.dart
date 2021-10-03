@@ -52,7 +52,7 @@ class _PasswordFormState extends State<PasswordForm> {
             title: Text((widget?.password?.id ?? null) == null ? 'Add Password' : 'Update Password'),
           ),
           body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 14.0),
+            padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 16.0),
             child: _buildPasswordForm(),
           ),
         ),
@@ -62,6 +62,7 @@ class _PasswordFormState extends State<PasswordForm> {
 
   Widget _buildPasswordForm() {
     return SingleChildScrollView(
+      padding: EdgeInsets.only(top: 8),
       child: Column(
         children: [
           ..._buildFormFields(),
@@ -82,9 +83,8 @@ class _PasswordFormState extends State<PasswordForm> {
   }
 
   Widget _buildAccountNameField() {
-    //Todo : keyboard causing account name label to squish
     return Padding(
-      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier,),
       child: TextField(
         controller: _accountNameController,
         decoration: InputDecoration(
@@ -100,7 +100,7 @@ class _PasswordFormState extends State<PasswordForm> {
 
   Widget _buildEmailField() {
     return Padding(
-      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
       child: TextField(
         controller: _emailController,
         decoration: InputDecoration(
@@ -116,7 +116,7 @@ class _PasswordFormState extends State<PasswordForm> {
 
   Widget _buildUsernameField() {
     return Padding(
-      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
       child: TextField(
         controller: _usernameController,
         decoration: InputDecoration(
@@ -132,7 +132,7 @@ class _PasswordFormState extends State<PasswordForm> {
 
   Widget _buildPasswordField() {
     return Padding(
-      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+      padding: EdgeInsets.only(bottom: 2 * SizeConfig.heightMultiplier),
       child: TextField(
         controller: _passwordController,
         obscureText: !_isPasswordVisible,

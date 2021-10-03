@@ -24,6 +24,7 @@ class _AccountListPageState extends State<AccountListPage> {
     super.initState();
     _loading = true;
     _passwordService = serviceLocator.get<PasswordService>();
+    //TODO add a listener to this that has a debounce and loads passwords from db
     _passwordSearchController = new TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -228,7 +229,7 @@ class _AccountListPageState extends State<AccountListPage> {
       itemCount: _passwords.length,
       itemBuilder: (context, index) {
         Password password = _passwords[index];
-        String subtitle = (password.email ?? '').isEmpty ? password.username : password.email;
+        String subtitle = _getEmailOrUsername(password);
 
         return ListTile(
           title: Text(password.accountName),
@@ -247,43 +248,87 @@ class _AccountListPageState extends State<AccountListPage> {
     );
   }
 
+  String _getEmailOrUsername(Password password) {
+    String subtitle = (password.email ?? '').isEmpty ? password.username : password.email;
+    return subtitle;
+  }
+
   void _showPasswordPressedDialog(Password password) async {
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    var containerWidthMultiplier = isPortrait ?  0.9 : 0.45;
 
     SimpleDialog passwordDialog = new SimpleDialog(
-      title: Text(password.accountName),
+      contentPadding: EdgeInsets.fromLTRB(6, 24, 0, 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(5 * SizeConfig.widthMultiplier)
+        ),
+      ),
+      title: Column(
+        children: [
+          Text(
+            password.accountName,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            _getEmailOrUsername(password),
+            style: Theme.of(context).textTheme.subtitle1
+          )
+        ],
+      ),
       children: <Widget>[
+        Container(width: containerWidthMultiplier * MediaQuery.of(context).size.width),
         SimpleDialogOption(
           onPressed: () {
             Navigator.of(context).pop(PasswordAction.view);
           },
-          child: Row(
-            children: [
-              Icon(Icons.read_more),
-              Text("View Details")
-            ],
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Icon(Icons.read_more),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text("View Details"),
+                )
+              ],
+            ),
           )
         ),
-        SimpleDialogOption(
-            onPressed: () {
-              Navigator.of(context).pop(PasswordAction.edit);
-            },
-            child: Row(
-              children: [
-                Icon(Icons.edit),
-                Text("Edit Password")
-              ],
-            )
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop(PasswordAction.edit);
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.edit),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text("Edit Password"),
+                  )
+                ],
+              )
+          ),
         ),
-        SimpleDialogOption(
-            onPressed: () {
-              Navigator.of(context).pop(PasswordAction.delete);
-            },
-            child: Row(
-              children: [
-                Icon(Icons.delete_forever),
-                Text("Delete Password")
-              ],
-            )
+        // TODO: don't show this option for super password
+        Padding(
+          padding: EdgeInsets.only(bottom: 1.2 * SizeConfig.heightMultiplier),
+          child: SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop(PasswordAction.delete);
+              },
+              child: Row(
+                children: [
+                  Icon(Icons.delete_forever),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text("Delete Password"),
+                  )
+                ],
+              )
+          ),
         ),
       ],
     );
@@ -296,10 +341,9 @@ class _AccountListPageState extends State<AccountListPage> {
     if(result == null) return;
 
     if(result == PasswordAction.view) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("View details coming soon"))
-      );
+      _showPasswordDetailsDialog(password);
     } else if(result == PasswordAction.edit) {
+      //TODO: Separate route for update super password
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
           return PasswordForm(password: new Password.clone(password));
@@ -311,5 +355,80 @@ class _AccountListPageState extends State<AccountListPage> {
         SnackBar(content: Text("Delete coming soon"))
       );
     }
+  }
+
+  void _showPasswordDetailsDialog(Password password) async {
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    var containerWidthMultiplier = isPortrait ?  0.9 : 0.45;
+
+    SimpleDialog passwordDetailsDialog = new SimpleDialog(
+      contentPadding: EdgeInsets.fromLTRB(24, 24, 0, 16),
+      titlePadding: EdgeInsets.fromLTRB(32, 24, 32, 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+            Radius.circular(5 * SizeConfig.widthMultiplier)
+        ),
+      ),
+      title: Text(
+        password.accountName,
+        textAlign: TextAlign.center,
+      ),
+      children: <Widget>[
+        // Container(width: containerWidthMultiplier * MediaQuery.of(context).size.width),
+        Container(
+          margin: EdgeInsets.only(bottom: 2.5 * SizeConfig.heightMultiplier),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Email",
+                style: Theme.of(context).textTheme.subtitle2
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
+                child: Text((password.email ?? '').isEmpty ? '- - -' : password.email),
+              )
+            ]
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 2.5 * SizeConfig.heightMultiplier),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Username",
+                style: Theme.of(context).textTheme.subtitle2
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
+                child: Text((password.username ?? '').isEmpty ? '- - -' : password.username),
+              )
+            ]
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 2.5 * SizeConfig.heightMultiplier),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Password",
+                style: Theme.of(context).textTheme.subtitle2
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
+                child: Text(password.password),
+              )
+            ]
+          ),
+        ),
+      ],
+    );
+
+    await showDialog<void>(
+        context: context,
+        builder: (_) => passwordDetailsDialog
+    );
   }
 }
