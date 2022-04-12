@@ -14,21 +14,20 @@ class AccountListPage extends StatefulWidget {
 }
 
 class _AccountListPageState extends State<AccountListPage> {
-  PasswordService _passwordService;
-  List<Password> _passwords;
-  TextEditingController _passwordSearchController;
+  late PasswordService _passwordService;
+  List<Password> _passwords = [];
+  late TextEditingController _passwordSearchController;
   bool _showHidden = false;
-  bool _loading;
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loading = true;
     _passwordService = serviceLocator.get<PasswordService>();
     //TODO add a listener to this that has a debounce and loads passwords from db
     _passwordSearchController = new TextEditingController();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
       _loadPasswords("").then((_) {
         setState(() {
           _loading = false;
@@ -59,7 +58,7 @@ class _AccountListPageState extends State<AccountListPage> {
         onTap: () {
           final FocusScopeNode currentScope = FocusScope.of(context);
           if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
-            FocusManager.instance.primaryFocus.unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
           }
         },
         child: Scaffold(
@@ -84,7 +83,7 @@ class _AccountListPageState extends State<AccountListPage> {
                 }),
               );
 
-              await this._loadPasswords(_passwordSearchController.text ?? '');
+              await this._loadPasswords(_passwordSearchController.text);
             },
           ),
         )
@@ -151,7 +150,7 @@ class _AccountListPageState extends State<AccountListPage> {
   }
   
   Widget _buildPasswordScreen() {
-    if((_passwords ?? []).length == 0) {
+    if((_passwords).length == 0) {
       return _buildEmptyListScreen();
     } else {
       return _buildHasPasswordScreen();
@@ -253,7 +252,7 @@ class _AccountListPageState extends State<AccountListPage> {
   }
 
   String _getEmailOrUsername(Password password) {
-    String subtitle = (password.email ?? '').isEmpty ? password.username : password.email;
+    String subtitle = (password.email).isEmpty ? password.username : password.email;
     return subtitle;
   }
 
@@ -337,7 +336,7 @@ class _AccountListPageState extends State<AccountListPage> {
       ],
     );
 
-    PasswordAction result = await showDialog<PasswordAction>(
+    PasswordAction? result = await showDialog<PasswordAction>(
       context: context,
       builder: (_) => passwordDialog
     );
@@ -386,7 +385,7 @@ class _AccountListPageState extends State<AccountListPage> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
-                child: Text((password.email ?? '').isEmpty ? '- - -' : password.email),
+                child: Text((password.email).isEmpty ? '- - -' : password.email),
               )
             ]
           ),
@@ -402,7 +401,7 @@ class _AccountListPageState extends State<AccountListPage> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
-                child: Text((password.username ?? '').isEmpty ? '- - -' : password.username),
+                child: Text((password.username).isEmpty ? '- - -' : password.username),
               )
             ]
           ),

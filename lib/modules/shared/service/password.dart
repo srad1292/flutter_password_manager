@@ -3,8 +3,8 @@ import 'package:password_manager/modules/shared/model/password.dart';
 
 class PasswordService {
 
-  List<Password> passwords;
-  PasswordDao _passwordDao;
+  late List<Password> passwords;
+  late PasswordDao _passwordDao;
 
   PasswordService() {
     this.passwords = [];
@@ -20,14 +20,14 @@ class PasswordService {
     return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
   }
 
-  Future<Password> getPasswordById({int passwordId = 0}) async {
+  Future<Password?> getPasswordById({int passwordId = 0}) async {
     return await this._passwordDao.getPasswordById(passwordId: passwordId);
   }
 
   Future<Password> createPassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
     print("Create password ID: $id");
-    if(id != null && id != 0) {
+    if(id != 0) {
       password.id = id;
     }
     return password;

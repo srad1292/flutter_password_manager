@@ -1,19 +1,19 @@
 class Settings {
-  bool guardChangeSettings;
-  bool guardViewPassword;
-  bool guardAddPassword;
-  bool guardEditPassword;
-  bool guardDeletePassword;
-  bool guardShowSecretPasswords;
-  bool guardImportPasswords;
-  bool guardExportPasswords;
+  late bool guardChangeSettings;
+  late bool guardViewPassword;
+  late bool guardAddPassword;
+  late bool guardEditPassword;
+  late bool guardDeletePassword;
+  late bool guardShowSecretPasswords;
+  late bool guardImportPasswords;
+  late bool guardExportPasswords;
 
   Settings();
 
-  Settings.init({bool guardChangeSettings, bool guardViewPassword,
-    bool guardAddPassword, bool guardEditPassword,
-    bool guardDeletePassword, bool guardShowSecretPasswords,
-    bool guardImportPasswords, bool guardExportPasswords})
+  Settings.init({required bool guardChangeSettings, required bool guardViewPassword,
+    required bool guardAddPassword, required bool guardEditPassword,
+    required bool guardDeletePassword, required bool guardShowSecretPasswords,
+    required bool guardImportPasswords, required bool guardExportPasswords})
   {
     this.guardChangeSettings = guardChangeSettings;
     this.guardViewPassword = guardViewPassword;

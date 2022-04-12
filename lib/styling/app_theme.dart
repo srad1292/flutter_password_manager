@@ -34,8 +34,9 @@ class AppTheme {
     backgroundColor: appBarLight,
     foregroundColor: Colors.white,
     centerTitle: true,
-    textTheme: lightTextTheme,
     iconTheme: barIconThemeLight,
+    toolbarTextStyle: lightTextTheme.bodyText2,
+    titleTextStyle: lightTextTheme.headline6,
   );
 
   static final AppBarTheme appBarThemeDark = AppBarTheme(

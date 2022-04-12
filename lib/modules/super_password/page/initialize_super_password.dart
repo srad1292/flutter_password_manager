@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/account_list/account_list_page.dart';
 import 'package:password_manager/utils/size_config.dart';
@@ -45,7 +44,7 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                       padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
                       child: Text(
                         'Please Setup a Super Password',
-                        style: Theme.of(context).textTheme.bodyText2.copyWith(fontWeight: FontWeight.w500)
+                        style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w500)
                       ),
                     ),
                     Padding(

@@ -1,7 +1,7 @@
 import 'package:password_manager/modules/shared/model/settings.dart';
 
 class SettingsService {
-  Settings _settings;
+  late Settings _settings;
 
   SettingsService() {
     this._settings = new Settings();

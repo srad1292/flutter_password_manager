@@ -1,11 +1,11 @@
 class Password {
-  int id;
-  String accountName;
-  String email;
-  String username;
-  String password;
-  bool isSecret;
-  bool isSuper;
+  int? id;
+  late String accountName;
+  late String email;
+  late String username;
+  late String password;
+  late bool isSecret;
+  late bool isSuper;
 
   Password({
     this.id, this.accountName = '', this.email = '', this.username = '',

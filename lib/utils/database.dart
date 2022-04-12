@@ -8,9 +8,9 @@ class DBProvider {
   DBProvider._();
   static final DBProvider db = DBProvider._();
 
-  Database _database;
+  Database? _database;
 
-  Future<Database> get database async {
+  Future<Database?> get database async {
     if(_database != null) {
       return _database;
     }

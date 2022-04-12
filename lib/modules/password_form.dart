@@ -6,7 +6,7 @@ import 'package:password_manager/utils/size_config.dart';
 
 class PasswordForm extends StatefulWidget {
 
-  final Password password;
+  final Password? password;
 
   PasswordForm({this.password});
 
@@ -15,13 +15,13 @@ class PasswordForm extends StatefulWidget {
 }
 
 class _PasswordFormState extends State<PasswordForm> {
-  PasswordService _passwordService;
+  late PasswordService _passwordService;
 
-  TextEditingController _accountNameController;
-  TextEditingController _emailController;
-  TextEditingController _usernameController;
-  TextEditingController _passwordController;
-  bool _isSecret;
+  late TextEditingController _accountNameController;
+  late TextEditingController _emailController;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
+  late  bool _isSecret;
   bool _isPasswordVisible = false;
 
   @override
@@ -30,14 +30,14 @@ class _PasswordFormState extends State<PasswordForm> {
     _passwordService = serviceLocator.get<PasswordService>();
 
     _accountNameController = new TextEditingController();
-    _accountNameController.text = widget?.password?.accountName ?? '';
+    _accountNameController.text = widget.password?.accountName ?? '';
     _emailController = new TextEditingController();
-    _emailController.text = widget?.password?.email ?? '';
+    _emailController.text = widget.password?.email ?? '';
     _usernameController = new TextEditingController();
-    _usernameController.text = widget?.password?.username ?? '';
+    _usernameController.text = widget.password?.username ?? '';
     _passwordController = new TextEditingController();
-    _passwordController.text = widget?.password?.password ?? '';
-    _isSecret = widget?.password?.isSecret == true;
+    _passwordController.text = widget.password?.password ?? '';
+    _isSecret = widget.password?.isSecret == true;
   }
 
   @override
@@ -49,7 +49,7 @@ class _PasswordFormState extends State<PasswordForm> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text((widget?.password?.id ?? null) == null ? 'Add Password' : 'Update Password'),
+            title: Text((widget.password?.id ?? null) == null ? 'Add Password' : 'Update Password'),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 16.0),
@@ -166,9 +166,9 @@ class _PasswordFormState extends State<PasswordForm> {
         title: Text("Secret Account?"),
         controlAffinity: ListTileControlAffinity.leading,
         value: _isSecret,
-        onChanged: (bool value) {
+        onChanged: (bool? value) {
           setState(() {
-            _isSecret = value;
+            _isSecret = value ?? false;
           });
         },
         activeColor: Colors.lightBlue,
@@ -181,7 +181,7 @@ class _PasswordFormState extends State<PasswordForm> {
     return ElevatedButton(
       onPressed: () async {
         Password password = new Password(
-          id: widget?.password?.id,
+          id: widget.password?.id,
           accountName: _accountNameController.text,
           email: _emailController.text,
           username: _usernameController.text,
@@ -189,7 +189,7 @@ class _PasswordFormState extends State<PasswordForm> {
           isSecret: _isSecret
         );
 
-        Function saveFunction = widget?.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
+        Function saveFunction = widget.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
 
         await saveFunction(password);
 

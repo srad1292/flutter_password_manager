@@ -18,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _importPasswordsToggle = true;
   bool _exportPasswordsToggle = true;
 
-  SettingsService _settingsService;
+  late SettingsService _settingsService;
 
   @override
   void initState() {
@@ -152,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
           print("Updated Settings");
           print(_settingsService.getSettings().toString());
         },
-        child: Text("Save Password"),
+        child: Text("Save Settings"),
       ),
     );
   }
