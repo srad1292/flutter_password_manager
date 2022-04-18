@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
 import 'package:password_manager/modules/settings/settings_page.dart';
@@ -17,15 +19,17 @@ class _AccountListPageState extends State<AccountListPage> {
   late PasswordService _passwordService;
   List<Password> _passwords = [];
   late TextEditingController _passwordSearchController;
+  String _passwordSearchText = '';
   bool _showHidden = false;
   bool _loading = true;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _passwordService = serviceLocator.get<PasswordService>();
-    //TODO add a listener to this that has a debounce and loads passwords from db
     _passwordSearchController = new TextEditingController();
+    _passwordSearchController.addListener(_setupPasswordSearch);
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _loadPasswords("").then((_) {
@@ -36,15 +40,49 @@ class _AccountListPageState extends State<AccountListPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _passwordSearchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _setupPasswordSearch() {
+    if(_passwordSearchController.text == _passwordSearchText) {
+      print("Search matches text so I am just returning");
+      return;
+    }
+
+    setState(() {
+      _passwordSearchText = _passwordSearchController.text;
+    });
+
+    if(_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _passwordSearchText = _passwordSearchController.text;
+        });
+        _loadPasswords(_passwordSearchText);
+      }
+    });
+  }
+
   Future<void> _loadPasswords(String accountSearch) async {
     try {
       List<Password> dbPasswords = await this._passwordService.getPasswordsFromPersistence(
         showSecret: _showHidden,
         accountSearch: accountSearch
       );
-      setState(() {
-        _passwords = dbPasswords;
-      });
+
+      if(mounted) {
+        setState(() {
+          _passwords = dbPasswords;
+        });
+      }
     } catch(error) {
       print("error loading passwords");
       print(error);
@@ -83,7 +121,7 @@ class _AccountListPageState extends State<AccountListPage> {
                 }),
               );
 
-              await this._loadPasswords(_passwordSearchController.text);
+              await this._loadPasswords(_passwordSearchText);
             },
           ),
         )
@@ -193,7 +231,7 @@ class _AccountListPageState extends State<AccountListPage> {
       child: TextField(
         controller: _passwordSearchController,
         decoration: InputDecoration(
-          hintText: "Search Application",
+          hintText: "Search Passwords",
           suffixIcon: Icon(Icons.search, color: Colors.black45),
         ),
       ),
@@ -215,7 +253,7 @@ class _AccountListPageState extends State<AccountListPage> {
               setState(() {
                 _showHidden = newValue;
               });
-              this._loadPasswords(_passwordSearchController.text);
+              this._loadPasswords(_passwordSearchText);
             },
             activeColor: Colors.blueAccent,
             activeTrackColor: Colors.lightBlueAccent,
@@ -352,7 +390,7 @@ class _AccountListPageState extends State<AccountListPage> {
           return PasswordForm(password: new Password.clone(password));
         }),
       );
-      this._loadPasswords(_passwordSearchController.text);
+      this._loadPasswords(_passwordSearchText);
     } else if(result == PasswordAction.delete) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Delete coming soon"))
