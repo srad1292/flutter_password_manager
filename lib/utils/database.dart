@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:password_manager/utils/database_tables.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -29,11 +30,12 @@ class DBProvider {
 
   void _createCallback(Database db, int version) async {
     await db.execute(_getUserSchema());
+    await db.execute(_getPasswordRequestSchema());
   }
 
 
   String _getUserSchema() {
-    return "CREATE TABLE password ("
+    return "CREATE TABLE ${DatabaseTables.PASSWORD} ("
       "id INTEGER PRIMARY KEY,"
       "account_name TEXT,"
       "email TEXT,"
@@ -42,6 +44,14 @@ class DBProvider {
       "is_secret INTEGER default 0,"
       "is_super INTEGER default 0"
       ");";
+  }
+
+  String _getPasswordRequestSchema() {
+    return "CREATE TABLE ${DatabaseTables.PASSWORD_REQUEST_SETTINGS} ("
+        "id INTEGER PRIMARY KEY,"
+        "request_name TEXT,"
+        "should_request INTEGER default 1"
+        ");";
   }
 
 }
