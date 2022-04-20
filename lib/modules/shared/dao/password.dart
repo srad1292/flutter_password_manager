@@ -18,7 +18,32 @@ class PasswordDao {
       print("Error adding or replacing password");
       print(error);
     }
-    return 0;
+    return -1;
+  }
+
+  /// Returns super password if found, empty password if not, null if error
+  Future<Password?> getSuperPassword() async {
+    Database? db = await DBProvider.db.database;
+    try {
+      List<Map<String, dynamic>>? dbPasswords = await db?.query(
+        "password",
+        where: "is_super = ?",
+        whereArgs:[1]
+      );
+
+      if(dbPasswords != null && dbPasswords.length > 0) {
+        return List.generate(dbPasswords.length, (index) {
+          return Password.fromPersistence(dbPasswords[index]);
+        })[0];
+      } else {
+        return new Password();
+      }
+    } catch(error) {
+      print("Error in getSuperPassword");
+      print(error);
+    }
+
+    return null;
   }
 
   Future<Password?> getPasswordById({int passwordId = 0}) async {
@@ -44,8 +69,8 @@ class PasswordDao {
     try {
       List<Map<String, dynamic>>? dbPasswords = await db?.query(
         "password",
-        where: showSecret ? "account_name like ?" : "is_secret = ? and account_name like ?",
-        whereArgs: showSecret ? ["%${accountSearch.toLowerCase()}%"] : [0, "%${accountSearch.toLowerCase()}%"]
+        where: showSecret ? "is_super = ? and account_name like ?" : "is_super = ? and is_secret = ? and account_name like ?",
+        whereArgs: showSecret ? [0, "%${accountSearch.toLowerCase()}%"] : [0, 0, "%${accountSearch.toLowerCase()}%"]
       );
       if(dbPasswords != null && dbPasswords.length > 0) {
         return List.generate(dbPasswords.length, (index) {

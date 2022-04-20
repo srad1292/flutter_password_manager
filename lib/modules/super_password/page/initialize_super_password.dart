@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/account_list/account_list_page.dart';
+import 'package:password_manager/modules/shared/model/password.dart';
+import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
 class InitializeSuperPassword extends StatefulWidget {
@@ -98,12 +101,32 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) {
-                            return AccountListPage();
-                          }),
+                      onPressed: () async {
+                        // todo: some loading thing maybe
+                        // disable the save button while it is trying to save
+
+                        // save password
+                        PasswordService passwordService = serviceLocator.get<PasswordService>();
+                        Password passwordToSave = new Password(
+                          isSuper: true,
+                          accountName: "App Super Password",
+                          password: _passwordController.text.trim()
                         );
+                        Password? savedPassword = await passwordService.createPassword(passwordToSave);
+                        if(savedPassword != null) {
+                          // if it works, navigate
+                          passwordService.superPassword = savedPassword;
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) {
+                              return AccountListPage();
+                            }),
+                          );
+                        }
+                        else {
+                          // if it fails, show a message saying password failed to save
+                          print("Failed to create super password");
+                        }
+
                       },
                       child: Text("Save Password"),
                     ),

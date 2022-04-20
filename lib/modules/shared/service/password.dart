@@ -5,6 +5,7 @@ class PasswordService {
 
   late List<Password> passwords;
   late PasswordDao _passwordDao;
+  Password? superPassword;
 
   PasswordService() {
     this.passwords = [];
@@ -20,17 +21,23 @@ class PasswordService {
     return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
   }
 
+  Future<Password?> getSuperPassword() async {
+    return await this._passwordDao.getSuperPassword();
+  }
+
   Future<Password?> getPasswordById({int passwordId = 0}) async {
     return await this._passwordDao.getPasswordById(passwordId: passwordId);
   }
 
-  Future<Password> createPassword(Password password) async {
+  Future<Password?> createPassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
     print("Create password ID: $id");
-    if(id != 0) {
+    if(id != -1) {
       password.id = id;
+      return password;
     }
-    return password;
+
+    return null;
   }
 
   Future<Password> updatePassword(Password password) async {
