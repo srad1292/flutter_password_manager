@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:password_manager/modules/initialization_page/initialization_page.dart';
 import 'package:password_manager/styling/app_theme.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -20,7 +21,7 @@ class _PasswordManagerAppState extends State<PasswordManagerApp> {
             return MaterialApp(
               title: 'Flutter Demo',
               theme: AppTheme.lightTheme,
-              home: InitializeSuperPassword(),
+              home: InitializationPage(),
             );
           }
         );
