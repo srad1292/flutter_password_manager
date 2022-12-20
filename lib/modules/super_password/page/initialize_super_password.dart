@@ -18,6 +18,7 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
   String _confirmPasswordInputError = '';
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -103,9 +104,10 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                     ElevatedButton(
                       onPressed: () async {
                         // todo: some loading thing maybe
-                        // disable the save button while it is trying to save
+                        if(_isSaving) { return; }
 
                         // save password
+                        _isSaving = true;
                         PasswordService passwordService = serviceLocator.get<PasswordService>();
                         Password passwordToSave = new Password(
                           isSuper: true,
@@ -113,8 +115,8 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                           password: _passwordController.text.trim()
                         );
                         Password? savedPassword = await passwordService.createPassword(passwordToSave);
+                        _isSaving = false;
                         if(savedPassword != null) {
-                          // if it works, navigate
                           passwordService.superPassword = savedPassword;
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) {

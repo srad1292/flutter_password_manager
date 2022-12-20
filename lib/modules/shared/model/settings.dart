@@ -1,12 +1,12 @@
 class Settings {
-  late bool guardChangeSettings;
-  late bool guardViewPassword;
-  late bool guardAddPassword;
-  late bool guardEditPassword;
-  late bool guardDeletePassword;
-  late bool guardShowSecretPasswords;
-  late bool guardImportPasswords;
-  late bool guardExportPasswords;
+  bool guardChangeSettings = true;
+  bool guardViewPassword = true;
+  bool guardAddPassword = true;
+  bool guardEditPassword = true;
+  bool guardDeletePassword = true;
+  bool guardShowSecretPasswords = true;
+  bool guardImportPasswords = true;
+  bool guardExportPasswords = true;
 
   Settings();
 

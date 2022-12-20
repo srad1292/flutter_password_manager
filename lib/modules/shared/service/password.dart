@@ -49,7 +49,7 @@ class PasswordService {
     return password;
   }
 
-  Future<int> deletePassword({int passwordID = 0}) async {
+  Future<int> deletePassword({int passwordID = -1}) async {
     int deletedCount = await this._passwordDao.deletePassword(passwordId: passwordID);
     return deletedCount;
   }

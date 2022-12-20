@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:password_manager/common/widget/error_dialog.dart';
+import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -16,6 +19,8 @@ class PasswordForm extends StatefulWidget {
 
 class _PasswordFormState extends State<PasswordForm> {
   late PasswordService _passwordService;
+  late SettingsService _settingsService;
+
 
   late TextEditingController _accountNameController;
   late TextEditingController _emailController;
@@ -24,10 +29,14 @@ class _PasswordFormState extends State<PasswordForm> {
   late  bool _isSecret;
   bool _isPasswordVisible = false;
 
+  bool saving = false;
+  bool formValid = false;
+
   @override
   void initState() {
     super.initState();
     _passwordService = serviceLocator.get<PasswordService>();
+    _settingsService = serviceLocator.get<SettingsService>();
 
     _accountNameController = new TextEditingController();
     _accountNameController.text = widget.password?.accountName ?? '';
@@ -38,6 +47,24 @@ class _PasswordFormState extends State<PasswordForm> {
     _passwordController = new TextEditingController();
     _passwordController.text = widget.password?.password ?? '';
     _isSecret = widget.password?.isSecret == true;
+
+    validateForm();
+
+    setupFormValidation();
+  }
+
+  void setupFormValidation() {
+    _accountNameController.addListener(() { validateForm(); });
+    _passwordController.addListener(() { validateForm(); });
+  }
+
+  @override
+  void dispose() {
+    _accountNameController.dispose();
+    _emailController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -58,6 +85,15 @@ class _PasswordFormState extends State<PasswordForm> {
         ),
       ),
     );
+  }
+
+  void validateForm() {
+    bool isFormValid = _accountNameController.text.trim().isNotEmpty && _passwordController.text.trim().isNotEmpty;
+    if(isFormValid != formValid) {
+      setState(() {
+        formValid = isFormValid;
+      });
+    }
   }
 
   Widget _buildPasswordForm() {
@@ -88,7 +124,7 @@ class _PasswordFormState extends State<PasswordForm> {
       child: TextField(
         controller: _accountNameController,
         decoration: InputDecoration(
-            labelText: "Account Name",
+            labelText: "Account Name *",
             hintText: "Type Account Name",
             // errorText: _passwordInputError.isEmpty ? null : _passwordInputError,
         ),
@@ -137,7 +173,7 @@ class _PasswordFormState extends State<PasswordForm> {
         controller: _passwordController,
         obscureText: !_isPasswordVisible,
         decoration: InputDecoration(
-            labelText: "Password",
+            labelText: "Password *",
             hintText: "Type Password",
             // errorText: _passwordInputError.isEmpty ? null : _passwordInputError,
             suffixIcon: IconButton(
@@ -179,23 +215,40 @@ class _PasswordFormState extends State<PasswordForm> {
 
   Widget _buildSubmitButton() {
     return ElevatedButton(
-      onPressed: () async {
-        Password password = new Password(
-          id: widget.password?.id,
-          accountName: _accountNameController.text,
-          email: _emailController.text,
-          username: _usernameController.text,
-          password: _passwordController.text,
-          isSecret: _isSecret
-        );
-
-        Function saveFunction = widget.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
-
-        await saveFunction(password);
-
-        Navigator.of(context).pop();
-      },
-      child: Text("Save Password"),
+      onPressed: formValid && !saving ? () async {
+        if(_settingsService.getSettings().guardAddPassword) {
+          bool canAdd = await showPasswordRequest(context: context);
+          if(!canAdd) { return; }
+        }
+        savePassword();
+      } : null,
+      child: Text(saving ? "Saving..." : "Save Password"),
+      style: ButtonStyle(
+        enableFeedback: formValid
+      ),
     );
+  }
+
+  void savePassword() async {
+    setState(() { saving = true; });
+    Password password = new Password(
+        id: widget.password?.id,
+        accountName: _accountNameController.text,
+        email: _emailController.text,
+        username: _usernameController.text,
+        password: _passwordController.text,
+        isSecret: _isSecret
+    );
+
+    Function saveFunction = widget.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
+
+    try {
+      await saveFunction(password);
+      setState(() { saving = false; });
+      Navigator.of(context).pop();
+    } catch(err) {
+      await showErrorDialog(context: context, body: "Saving password failed.  Please try again.");
+      setState(() { saving = false; });
+    }
   }
 }

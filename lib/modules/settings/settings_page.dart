@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/shared/model/settings.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/utils/service_locator.dart';
@@ -9,14 +10,14 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _changeSettingsToggle = true;
-  bool _viewPasswordToggle = true;
-  bool _addPasswordToggle = true;
-  bool _editPasswordToggle = true;
-  bool _deletePasswordToggle = true;
-  bool _showSecretToggle = true;
-  bool _importPasswordsToggle = true;
-  bool _exportPasswordsToggle = true;
+  late bool _changeSettingsToggle;
+  late bool _viewPasswordToggle;
+  late bool _addPasswordToggle;
+  late bool _editPasswordToggle;
+  late bool _deletePasswordToggle;
+  late bool _showSecretToggle;
+  late bool _importPasswordsToggle;
+  late bool _exportPasswordsToggle;
 
   late SettingsService _settingsService;
 
@@ -24,6 +25,15 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _settingsService = serviceLocator.get<SettingsService>();
+    Settings initial = _settingsService.getSettings();
+    _changeSettingsToggle = initial.guardChangeSettings;
+    _viewPasswordToggle = initial.guardViewPassword;
+    _addPasswordToggle = initial.guardAddPassword;
+    _editPasswordToggle = initial.guardEditPassword;
+    _deletePasswordToggle = initial.guardDeletePassword;
+    _showSecretToggle = initial.guardShowSecretPasswords;
+    _importPasswordsToggle = initial.guardImportPasswords;
+    _exportPasswordsToggle = initial.guardExportPasswords;
   }
 
   @override
@@ -85,14 +95,9 @@ class _SettingsPageState extends State<SettingsPage> {
           _viewPasswordToggle = newValue;
         });
       }),
-      ..._buildSettingToggle("Add Password", _addPasswordToggle, (newValue) {
+      ..._buildSettingToggle("Add/Edit Password", _addPasswordToggle, (newValue) {
         setState(() {
           _addPasswordToggle = newValue;
-        });
-      }),
-      ..._buildSettingToggle("Edit Password", _editPasswordToggle, (newValue) {
-        setState(() {
-          _editPasswordToggle = newValue;
         });
       }),
       ..._buildSettingToggle("Delete Password", _deletePasswordToggle, (newValue) {
@@ -124,9 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(title),
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.blueAccent,
-        activeTrackColor: Colors.lightBlueAccent,
-        inactiveThumbColor: Colors.blueAccent,
+        inactiveThumbColor: Theme.of(context).toggleableActiveColor,
         inactiveTrackColor: Colors.black12,
       ),
       Divider(thickness: 2,)
@@ -138,6 +141,13 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: EdgeInsets.only(top: 12, bottom: 18),
       child: ElevatedButton(
         onPressed: () async {
+          if(_settingsService.getSettings().guardChangeSettings == true) {
+            bool confirmed = await showPasswordRequest(context: context);
+            if(!confirmed) {
+              return;
+            }
+          }
+
           Settings newSettings = new Settings.init(
             guardChangeSettings: _changeSettingsToggle, guardAddPassword: _addPasswordToggle,
             guardViewPassword: _viewPasswordToggle, guardEditPassword: _editPasswordToggle,
@@ -148,9 +158,11 @@ class _SettingsPageState extends State<SettingsPage> {
           print("New Settings");
           print(newSettings.toString());
 
-          _settingsService.updateSettings(newSettings);
+          await _settingsService.updateSettings(newSettings);
           print("Updated Settings");
           print(_settingsService.getSettings().toString());
+
+          Navigator.of(context).pop();
         },
         child: Text("Save Settings"),
       ),

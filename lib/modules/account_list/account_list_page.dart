@@ -1,10 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:password_manager/common/widget/confirmation_dalog.dart';
+import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
 import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/modules/shared/service/settings.dart';
+import 'package:password_manager/modules/super_password/page/super_password_options.dart';
+import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -19,6 +24,7 @@ class _AccountListPageState extends State<AccountListPage> {
   late PasswordService _passwordService;
   List<Password> _passwords = [];
   late TextEditingController _passwordSearchController;
+  late SettingsService _settingsService;
   String _passwordSearchText = '';
   bool _showHidden = false;
   bool _loading = true;
@@ -27,6 +33,7 @@ class _AccountListPageState extends State<AccountListPage> {
   @override
   void initState() {
     super.initState();
+    _settingsService = serviceLocator.get<SettingsService>();
     _passwordService = serviceLocator.get<PasswordService>();
     _passwordSearchController = new TextEditingController();
     _passwordSearchController.addListener(_setupPasswordSearch);
@@ -163,10 +170,24 @@ class _AccountListPageState extends State<AccountListPage> {
             title: const Text('Settings'),
             trailing: Icon(Icons.settings),
             onTap: () {
+              Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
                   return SettingsPage();
                 })
+              );
+            },
+          ),
+          Divider(thickness: 2,),
+          ListTile(
+            title: const Text('Super Password'),
+            trailing: Icon(Icons.vpn_key_outlined),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) {
+                    return SuperPasswordOptions();
+                  })
               );
             },
           ),
@@ -249,15 +270,22 @@ class _AccountListPageState extends State<AccountListPage> {
           ),
           Switch(
             value: _showHidden,
-            onChanged: (newValue) {
+            onChanged: (newValue) async {
+              if(_settingsService.getSettings().guardShowSecretPasswords && newValue == true) {
+                bool confirmed = await showPasswordRequest(context: context);
+                if(!confirmed) {
+                  setState(() {
+                    _showHidden = false;
+                  });
+                  return;
+                }
+              }
               setState(() {
                 _showHidden = newValue;
               });
               this._loadPasswords(_passwordSearchText);
             },
-            activeColor: Colors.blueAccent,
-            activeTrackColor: Colors.lightBlueAccent,
-            inactiveThumbColor: Colors.blueAccent,
+            inactiveThumbColor: Theme.of(context).toggleableActiveColor,
             inactiveTrackColor: Colors.black12,
           ),
         ],
@@ -320,7 +348,14 @@ class _AccountListPageState extends State<AccountListPage> {
       children: <Widget>[
         Container(width: containerWidthMultiplier * MediaQuery.of(context).size.width),
         SimpleDialogOption(
-          onPressed: () {
+          onPressed: () async {
+            if(_settingsService.getSettings().guardChangeSettings == true) {
+              bool confirmed = await showPasswordRequest(context: context);
+              if(!confirmed) {
+                return;
+              }
+            }
+
             Navigator.of(context).pop(PasswordAction.view);
           },
           child: Padding(
@@ -357,7 +392,15 @@ class _AccountListPageState extends State<AccountListPage> {
         Padding(
           padding: EdgeInsets.only(bottom: 1.2 * SizeConfig.heightMultiplier),
           child: SimpleDialogOption(
-              onPressed: () {
+              onPressed: () async {
+                bool confirmDelete = await showConfirmationDialog(context: context, body: "Delete ${password.accountName}?");
+                if(!confirmDelete) { return; }
+
+                if(_settingsService.getSettings().guardDeletePassword == true) {
+                  bool confirmPassword = await showPasswordRequest(context: context);
+                  if(!confirmPassword) { return; }
+                }
+
                 Navigator.of(context).pop(PasswordAction.delete);
               },
               child: Row(
@@ -392,9 +435,8 @@ class _AccountListPageState extends State<AccountListPage> {
       );
       this._loadPasswords(_passwordSearchText);
     } else if(result == PasswordAction.delete) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Delete coming soon"))
-      );
+      await _passwordService.deletePassword(passwordID: password.id ?? -1);
+      _loadPasswords(_passwordSearchText);
     }
   }
 

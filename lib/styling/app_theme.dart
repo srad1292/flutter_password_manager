@@ -7,20 +7,16 @@ import 'colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static const Color appBackgroundColor = Color(0xFFFFF7EC);
-  static const Color topBarBackgroundColor = Color(0xFFFFD974);
-  static const Color selectedTabBackgroundColor = Color(0xFFFFC442);
-  static const Color unSelectedTabBackgroundColor = Color(0xFFFFFFFC);
-  static const Color subTitleTextColor = Color(0xFF9F988F);
-
   static final ThemeData lightTheme = ThemeData(
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: appBackgroundColor,
     appBarTheme: appBarTheme,
+    floatingActionButtonTheme: fabThemeLight,
     brightness: Brightness.light,
     textTheme: lightTextTheme,
     inputDecorationTheme: inputDecorationThemeLight,
     iconTheme: iconThemeLight,
     elevatedButtonTheme: elevatedButtonThemeLight,
+    toggleableActiveColor: primaryLightForeground,
   );
 
   static final ThemeData darkTheme = ThemeData(
@@ -43,6 +39,11 @@ class AppTheme {
     backgroundColor: appBarDark,
     foregroundColor: Colors.black87,
     centerTitle: true
+  );
+
+  static final FloatingActionButtonThemeData fabThemeLight = FloatingActionButtonThemeData(
+    backgroundColor: primaryLight,
+    splashColor: primaryLightForeground
   );
 
   static final IconThemeData barIconThemeLight = IconThemeData(
@@ -187,7 +188,7 @@ class AppTheme {
   static final ElevatedButtonThemeData elevatedButtonThemeLight = ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       onPrimary: Colors.black87,
-      primary: appBarLight,
+      primary: primaryLight,
       textStyle: TextStyle(
         color: Colors.black87,
         fontSize: 2.5 * SizeConfig.textMultiplier,
@@ -198,4 +199,5 @@ class AppTheme {
       ),
     ),
   );
+
 }
