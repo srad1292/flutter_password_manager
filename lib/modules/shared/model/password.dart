@@ -5,11 +5,10 @@ class Password {
   late String username;
   late String password;
   late bool isSecret;
-  late bool isSuper;
 
   Password({
     this.id, this.accountName = '', this.email = '', this.username = '',
-    this.password = '', this.isSecret=false, this.isSuper=false
+    this.password = '', this.isSecret=false,
   });
 
   Password.clone(Password password) {
@@ -19,7 +18,6 @@ class Password {
     this.username = password.username;
     this.password = password.password;
     this.isSecret = password.isSecret;
-    this.isSuper = password.isSuper;
   }
 
   Map<String, dynamic> toPersistence() =>
@@ -30,7 +28,6 @@ class Password {
     'username': this.username,
     'password': this.password,
     'is_secret': this.isSecret == true ? 1 : 0,
-    'is_super': this.isSuper == true ? 1 : 0,
   };
 
   factory Password.fromPersistence(Map<String, dynamic> json) {
@@ -41,7 +38,6 @@ class Password {
       username: json['username'],
       password: json['password'],
       isSecret: json['is_secret'] == 1 ? true : false,
-      isSuper: json['is_super'] == 1 ? true : false,
     );
   }
 
@@ -55,7 +51,6 @@ class Password {
       username: ${this.username}, 
       password: ${this.password}, 
       isSecret: ${this.isSecret}, 
-      isSuper: ${this.isSecret}, 
     )''';
   }
 }

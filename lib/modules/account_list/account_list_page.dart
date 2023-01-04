@@ -8,8 +8,6 @@ import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
-import 'package:password_manager/modules/super_password/page/super_password_options.dart';
-import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -179,19 +177,6 @@ class _AccountListPageState extends State<AccountListPage> {
             },
           ),
           Divider(thickness: 2,),
-          ListTile(
-            title: const Text('Super Password'),
-            trailing: Icon(Icons.vpn_key_outlined),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) {
-                    return SuperPasswordOptions();
-                  })
-              );
-            },
-          ),
-          Divider(thickness: 2,),
         ],
       ),
     );
@@ -349,7 +334,7 @@ class _AccountListPageState extends State<AccountListPage> {
         Container(width: containerWidthMultiplier * MediaQuery.of(context).size.width),
         SimpleDialogOption(
           onPressed: () async {
-            if(_settingsService.getSettings().guardChangeSettings == true) {
+            if(_settingsService.getSettings().guardViewPassword == true) {
               bool confirmed = await showPasswordRequest(context: context);
               if(!confirmed) {
                 return;
@@ -388,7 +373,6 @@ class _AccountListPageState extends State<AccountListPage> {
               )
           ),
         ),
-        // TODO: don't show this option for super password
         Padding(
           padding: EdgeInsets.only(bottom: 1.2 * SizeConfig.heightMultiplier),
           child: SimpleDialogOption(
@@ -427,7 +411,6 @@ class _AccountListPageState extends State<AccountListPage> {
     if(result == PasswordAction.view) {
       _showPasswordDetailsDialog(password);
     } else if(result == PasswordAction.edit) {
-      //TODO: Separate route for update super password
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
           return PasswordForm(password: new Password.clone(password));

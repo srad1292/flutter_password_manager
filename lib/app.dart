@@ -3,7 +3,6 @@ import 'package:password_manager/modules/initialization_page/initialization_page
 import 'package:password_manager/styling/app_theme.dart';
 import 'package:password_manager/utils/size_config.dart';
 
-import 'modules/super_password/page/initialize_super_password.dart';
 
 class PasswordManagerApp extends StatefulWidget {
   @override
@@ -19,7 +18,7 @@ class _PasswordManagerAppState extends State<PasswordManagerApp> {
           builder: (context, orientation) {
             SizeConfig().init(constraints, orientation);
             return MaterialApp(
-              title: 'Flutter Demo',
+              title: 'Password Manager',
               theme: AppTheme.lightTheme,
               home: InitializationPage(),
             );

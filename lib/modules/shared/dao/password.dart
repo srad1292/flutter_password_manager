@@ -2,6 +2,7 @@
 
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/utils/database.dart';
+import 'package:password_manager/utils/database_tables.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PasswordDao {
@@ -11,7 +12,7 @@ class PasswordDao {
   Future<int> addOrReplacePassword(Password password) async {
     Database? db = await DBProvider.db.database;
     try {
-      int? id = await db?.insert("password", password.toPersistence(),
+      int? id = await db?.insert(DatabaseTables.PASSWORD, password.toPersistence(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       return id ?? -1;
     } catch(error) {
@@ -21,37 +22,12 @@ class PasswordDao {
     return -1;
   }
 
-  /// Returns super password if found, empty password if not, null if error
-  Future<Password?> getSuperPassword() async {
-    Database? db = await DBProvider.db.database;
-    try {
-      List<Map<String, dynamic>>? dbPasswords = await db?.query(
-        "password",
-        where: "is_super = ?",
-        whereArgs:[1]
-      );
-
-      if(dbPasswords != null && dbPasswords.length > 0) {
-        return List.generate(dbPasswords.length, (index) {
-          return Password.fromPersistence(dbPasswords[index]);
-        })[0];
-      } else {
-        return new Password();
-      }
-    } catch(error) {
-      print("Error in getSuperPassword");
-      print(error);
-    }
-
-    return null;
-  }
-
   Future<Password?> getPasswordById({int passwordId = 0}) async {
     if(passwordId <= 0) { return null; }
 
     Database? db = await DBProvider.db.database;
     try {
-      List<Map<String, dynamic>>? dbPassword = await db?.query("password", where: "id = ?", whereArgs: [passwordId], limit: 1);
+      List<Map<String, dynamic>>? dbPassword = await db?.query(DatabaseTables.PASSWORD, where: "id = ?", whereArgs: [passwordId], limit: 1);
       if(dbPassword != null && dbPassword.length > 0) {
         return Password.fromPersistence(dbPassword[0]);
       } else {
@@ -68,9 +44,9 @@ class PasswordDao {
     Database? db = await DBProvider.db.database;
     try {
       List<Map<String, dynamic>>? dbPasswords = await db?.query(
-        "password",
-        where: showSecret ? "is_super = ? and account_name like ?" : "is_super = ? and is_secret = ? and account_name like ?",
-        whereArgs: showSecret ? [0, "%${accountSearch.toLowerCase()}%"] : [0, 0, "%${accountSearch.toLowerCase()}%"]
+        DatabaseTables.PASSWORD,
+        where: showSecret ? "account_name like ?" : "is_secret = ? and account_name like ?",
+        whereArgs: showSecret ? ["%${accountSearch.toLowerCase()}%"] : [0, "%${accountSearch.toLowerCase()}%"]
       );
       if(dbPasswords != null && dbPasswords.length > 0) {
         return List.generate(dbPasswords.length, (index) {
@@ -92,7 +68,7 @@ class PasswordDao {
 
     Database? db = await DBProvider.db.database;
     try {
-      int? deletedCount = await db?.delete("password", where: "id = ?", whereArgs: [passwordId]);
+      int? deletedCount = await db?.delete(DatabaseTables.PASSWORD, where: "id = ?", whereArgs: [passwordId]);
       if(deletedCount != null && deletedCount > 0) {
         print("Count of deleted passwords: $deletedCount");
       }
@@ -108,7 +84,7 @@ class PasswordDao {
   Future<int> deleteAllPassword() async {
     Database? db = await DBProvider.db.database;
     try {
-      int? deletedCount = await db?.delete("password");
+      int? deletedCount = await db?.delete(DatabaseTables.PASSWORD);
       if(deletedCount != null && deletedCount > 0) {
         print("Count of deleted passwords: $deletedCount");
       }

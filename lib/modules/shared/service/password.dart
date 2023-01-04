@@ -1,28 +1,55 @@
+
 import 'package:password_manager/modules/shared/dao/password.dart';
+import 'package:password_manager/modules/shared/dao/super_password_dao.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
+import 'package:password_manager/modules/super_password/page/super_password.dart';
 
 class PasswordService {
 
   late List<Password> passwords;
   late PasswordDao _passwordDao;
-  Password? superPassword;
+  late SuperPasswordDao _superPasswordDao;
+  SuperPassword? superPassword;
 
   PasswordService() {
     this.passwords = [];
     this._passwordDao = new PasswordDao();
+    this._superPasswordDao = new SuperPasswordDao();
   }
 
   PasswordService.from(List<Password> passwords) {
     this.passwords = List.from(passwords);
     this._passwordDao = new PasswordDao();
+    this._superPasswordDao = new SuperPasswordDao();
   }
 
   Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = ''}) async {
     return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
   }
 
-  Future<Password?> getSuperPassword() async {
-    return await this._passwordDao.getSuperPassword();
+  Future<SuperPassword?> getSuperPassword() async {
+    return await this._superPasswordDao.getSuperPassword();
+  }
+
+  Future<SuperPassword?> createSuperPassword(SuperPassword password) async {
+    int id = await this._superPasswordDao.addOrReplacePassword(password);
+    print("Create super password ID: $id");
+    if(id != -1) {
+      password.id = id;
+      return password;
+    }
+
+    return null;
+  }
+
+  Future<SuperPassword> updateSuperPassword(SuperPassword password) async {
+    int id = await this._superPasswordDao.addOrReplacePassword(password);
+    print("Update super password ID: $id");
+    if(id != 0) {
+      password.id = id;
+    }
+    this.superPassword = new SuperPassword.clone(password);
+    return password;
   }
 
   Future<Password?> getPasswordById({int passwordId = 0}) async {

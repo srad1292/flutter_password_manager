@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:password_manager/common/widget/jumping_dot_indicator.dart';
 import 'package:password_manager/modules/account_list/account_list_page.dart';
-import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/modules/super_password/page/initialize_super_password.dart';
+import 'package:password_manager/modules/super_password/page/super_password.dart';
 import 'package:password_manager/utils/service_locator.dart';
 
 class InitializationPage extends StatefulWidget {
@@ -32,13 +32,13 @@ class _InitializationPageState extends State<InitializationPage> {
 
   void _determineNavigationPath() async {
     PasswordService passwordService = serviceLocator.get<PasswordService>();
-    Password? password = await passwordService.getSuperPassword();
+    SuperPassword? password = await passwordService.getSuperPassword();
 
     if(password == null) {
       setState(() {
         superPasswordFailed = true;
       });
-    } else if(password.accountName.isEmpty) {
+    } else if(password.password.isEmpty) {
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) {
             return InitializeSuperPassword();

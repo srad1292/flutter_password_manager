@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:password_manager/common/widget/error_dialog.dart';
 import 'package:password_manager/modules/account_list/account_list_page.dart';
-import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/modules/super_password/page/super_password.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -19,10 +20,31 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isSaving = false;
+  bool _formValid = false;
 
   @override
   void initState() {
     super.initState();
+
+    _passwordController.addListener(() {validateForm();});
+    _confirmPasswordController.addListener(() {validateForm();});
+  }
+
+  void validateForm() {
+    bool isFormValid = _passwordController.text.trim().isNotEmpty && _confirmPasswordController.text.trim().isNotEmpty &&
+      _passwordController.text.trim() == _confirmPasswordController.text.trim();
+    if(isFormValid != _formValid) {
+      setState(() {
+        _formValid = isFormValid;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,7 +56,7 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Welcome"),
+            title: Text("Create Super Password"),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
@@ -45,10 +67,18 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+                      padding: EdgeInsets.only(bottom: 1.5 * SizeConfig.heightMultiplier),
                       child: Text(
                         'Please Setup a Super Password',
                         style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w500)
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
+                      child: Text(
+                        'This super password will be used for confirmation when performing protected actions.',
+                        style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w400),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Padding(
@@ -77,7 +107,7 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 3 * SizeConfig.heightMultiplier),
+                      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
                       child: TextField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
@@ -102,22 +132,20 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () async {
+                      onPressed: _isSaving || !_formValid ? null : () async {
                         // todo: some loading thing maybe
-                        if(_isSaving) { return; }
+                        if(_isSaving || !_formValid) { return; }
 
                         // save password
                         _isSaving = true;
                         PasswordService passwordService = serviceLocator.get<PasswordService>();
-                        Password passwordToSave = new Password(
-                          isSuper: true,
-                          accountName: "App Super Password",
+                        SuperPassword passwordToSave = new SuperPassword(
                           password: _passwordController.text.trim()
                         );
-                        Password? savedPassword = await passwordService.createPassword(passwordToSave);
+                        SuperPassword? savedPassword = await passwordService.createSuperPassword(passwordToSave);
                         _isSaving = false;
                         if(savedPassword != null) {
-                          passwordService.superPassword = savedPassword;
+                          passwordService.superPassword = SuperPassword.clone(savedPassword);
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) {
                               return AccountListPage();
@@ -125,12 +153,14 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                           );
                         }
                         else {
-                          // if it fails, show a message saying password failed to save
-                          print("Failed to create super password");
+                          showErrorDialog(context: context, body: "Super Password failed to save. Try again");
                         }
 
                       },
-                      child: Text("Save Password"),
+                      child: Text(_isSaving ? "Saving..." : "Save Password"),
+                      style: ButtonStyle(
+                          enableFeedback: _formValid
+                      ),
                     ),
                   ],
                 ),

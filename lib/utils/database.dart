@@ -29,21 +29,28 @@ class DBProvider {
   }
 
   void _createCallback(Database db, int version) async {
-    await db.execute(_getUserSchema());
+    await db.execute(_getPasswordSchema());
+    await db.execute(_getSuperPasswordSchema());
     await db.execute(_getPasswordRequestSchema());
   }
 
 
-  String _getUserSchema() {
+  String _getPasswordSchema() {
     return "CREATE TABLE ${DatabaseTables.PASSWORD} ("
       "id INTEGER PRIMARY KEY,"
-      "account_name TEXT,"
+      "account_name TEXT NOT NULL,"
       "email TEXT,"
       "username TEXT,"
-      "password TEXT,"
-      "is_secret INTEGER default 0,"
-      "is_super INTEGER default 0"
+      "password TEXT NOT NULL,"
+      "is_secret INTEGER default 0"
       ");";
+  }
+
+  String _getSuperPasswordSchema() {
+    return "CREATE TABLE ${DatabaseTables.SUPER_PASSWORD} ("
+        "id INTEGER PRIMARY KEY,"
+        "password TEXT NOT NULL"
+    ");";
   }
 
   String _getPasswordRequestSchema() {

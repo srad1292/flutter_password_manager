@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/utils/service_locator.dart';
@@ -48,7 +47,6 @@ Widget doneButton(BuildContext dialogContext, BuildContext parentContext, StateS
 }
 
 Widget cancelButton(BuildContext parentContext) {
-  PasswordService passwordService = serviceLocator.get();
   return TextButton(
     child: Text(
       "Cancel",
