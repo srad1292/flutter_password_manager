@@ -30,6 +30,16 @@ class Password {
     'is_secret': this.isSecret == true ? 1 : 0,
   };
 
+  Map<String, dynamic> toJson() =>
+  {
+    'id': this.id,
+    'accountName': this.accountName,
+    'email': this.email,
+    'username': this.username,
+    'password': this.password,
+    'isSecret': this.isSecret,
+  };
+
   factory Password.fromPersistence(Map<String, dynamic> json) {
     return Password(
       id: json['id'],
@@ -38,6 +48,17 @@ class Password {
       username: json['username'],
       password: json['password'],
       isSecret: json['is_secret'] == 1 ? true : false,
+    );
+  }
+
+  factory Password.fromJson(Map<String, dynamic> json) {
+    return Password(
+      id: json['id'],
+      accountName: json['accountName'],
+      email: json['email'],
+      username: json['username'],
+      password: json['password'],
+      isSecret: json['isSecret'],
     );
   }
 

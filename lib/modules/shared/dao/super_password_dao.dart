@@ -1,5 +1,3 @@
-
-
 import 'package:password_manager/modules/super_password/page/super_password.dart';
 import 'package:password_manager/utils/database.dart';
 import 'package:password_manager/utils/database_tables.dart';

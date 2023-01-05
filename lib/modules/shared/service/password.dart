@@ -1,8 +1,13 @@
 
+import 'package:encrypt/encrypt.dart';
+import 'package:password_manager/modules/export/models/exportdata.dart';
 import 'package:password_manager/modules/shared/dao/password.dart';
 import 'package:password_manager/modules/shared/dao/super_password_dao.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
+import 'package:password_manager/modules/shared/service/encryptor_service.dart';
 import 'package:password_manager/modules/super_password/page/super_password.dart';
+import 'package:password_manager/utils/secrets/secret.dart';
+import 'package:password_manager/utils/secrets/secret_loader.dart';
 
 class PasswordService {
 
@@ -99,4 +104,44 @@ class PasswordService {
     int deletedCount = await this._passwordDao.deleteAllPassword();
     return deletedCount;
   }
+
+  Future<ExportData> getExportData() async {
+    SuperPassword superPassword = (await _superPasswordDao.getSuperPassword())!;
+    List<Password> accounts = await _passwordDao.getAllPasswords(showSecret: true);
+    List<Password> encrypted = await _encryptAccounts(accounts);
+    return new ExportData(superPassword, encrypted);
+  }
+
+  Future<List<Password>> _encryptAccounts(List<Password> accounts) async {
+    EncryptorService encryptorService = new EncryptorService();
+    Encrypter encryptor = await encryptorService.getEncryptor();
+    IV iv = IV.fromLength(16);
+
+    Password tempPassword;
+    List<Password> encryptedAccounts = accounts.map((e) {
+      tempPassword = Password.clone(e);
+      tempPassword.accountName = encryptor.encrypt(e.accountName, iv: iv).base64;
+      tempPassword.password = encryptor.encrypt(e.password, iv: iv).base64;
+      return tempPassword;
+    }).toList();
+
+    return encryptedAccounts;
+  }
+
+  Future<ExportData> decryptData(ExportData data) async {
+    EncryptorService encryptorService = new EncryptorService();
+    Encrypter encryptor = await encryptorService.getEncryptor();
+    IV iv = IV.fromLength(16);
+
+    Password tempPassword;
+    List<Password> decryptedAccounts = data.accounts.map((e) {
+      tempPassword = Password.clone(e);
+      tempPassword.accountName = encryptor.decrypt(Encrypted.fromBase64(e.accountName), iv: iv);
+      tempPassword.password = encryptor.decrypt(Encrypted.fromBase64(e.password), iv: iv);
+      return tempPassword;
+    }).toList();
+
+    return ExportData(SuperPassword.clone(data.superPassword), decryptedAccounts);
+  }
+
 }

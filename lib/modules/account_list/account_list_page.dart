@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:password_manager/common/widget/confirmation_dalog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
+import 'package:password_manager/modules/export/models/export_page.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
 import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
@@ -160,9 +161,13 @@ class _AccountListPageState extends State<AccountListPage> {
           ListTile(
             title: const Text('Export'),
             trailing: Icon(Icons.vertical_align_bottom),
-            onTap: () {
-              //TODO Add export functionality
-              print("Export coming soon");
+            onTap: () async {
+              Navigator.pop(context);
+              await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) {
+                    return ExportDataPage();
+                  })
+              );
             },
           ),
           Divider(thickness: 2,),
