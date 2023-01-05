@@ -77,13 +77,15 @@ class _AccountListPageState extends State<AccountListPage> {
   }
 
   Future<void> _loadPasswords(String accountSearch) async {
+    print("I am within load passwords");
     try {
       List<Password> dbPasswords = await this._passwordService.getPasswordsFromPersistence(
         showSecret: _showHidden,
         accountSearch: accountSearch
       );
-
+      print("I found dbPasswords: ${dbPasswords.length}");
       if(mounted) {
+        print("I am setting state");
         setState(() {
           _passwords = dbPasswords;
         });
@@ -167,13 +169,17 @@ class _AccountListPageState extends State<AccountListPage> {
           ListTile(
             title: const Text('Settings'),
             trailing: Icon(Icons.settings),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.of(context).push(
+              await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
                   return SettingsPage();
                 })
               );
+              if(_passwordService.hasResetSuperPassword) {
+                _passwordService.hasResetSuperPassword = false;
+                await this._loadPasswords(_passwordSearchText);
+              }
             },
           ),
           Divider(thickness: 2,),

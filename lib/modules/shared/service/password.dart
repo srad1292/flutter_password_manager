@@ -10,6 +10,7 @@ class PasswordService {
   late PasswordDao _passwordDao;
   late SuperPasswordDao _superPasswordDao;
   SuperPassword? superPassword;
+  bool hasResetSuperPassword = false;
 
   PasswordService() {
     this.passwords = [];
@@ -23,9 +24,6 @@ class PasswordService {
     this._superPasswordDao = new SuperPasswordDao();
   }
 
-  Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = ''}) async {
-    return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
-  }
 
   Future<SuperPassword?> getSuperPassword() async {
     return await this._superPasswordDao.getSuperPassword();
@@ -50,6 +48,22 @@ class PasswordService {
     }
     this.superPassword = new SuperPassword.clone(password);
     return password;
+  }
+
+  Future<bool> resetSuperPassword(SuperPassword password) async {
+    int newId = await this._superPasswordDao.resetSuperPassword(password);
+    bool didReset = newId >= 0;
+    print("Did i reset? $didReset");
+    if(didReset) {
+      this.superPassword = new SuperPassword.clone(password);
+      this.superPassword?.id = newId;
+      this.hasResetSuperPassword = true;
+    }
+    return didReset;
+  }
+
+  Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = ''}) async {
+    return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
   }
 
   Future<Password?> getPasswordById({int passwordId = 0}) async {

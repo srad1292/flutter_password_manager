@@ -60,4 +60,26 @@ class SuperPasswordDao {
 
     return 0;
   }
+
+  Future<int> resetSuperPassword(SuperPassword password) async {
+    Database? db = await DBProvider.db.database;
+    try {
+      int id = -1;
+      await db?.transaction((txn) async {
+        id = await txn.insert(DatabaseTables.SUPER_PASSWORD, password.toPersistence(),
+            conflictAlgorithm: ConflictAlgorithm.replace);
+        print("Updated super password. Id: $id");
+        print("Time to delete");
+        int deletedCount = await txn.delete(DatabaseTables.PASSWORD);
+        print("Delete finished");
+        print("Deleted password count: $deletedCount");
+      });
+      print("I am returning with value of: $id");
+      return id;
+    } catch(e) {
+      print(e.toString());
+      print("Reset super password failed");
+      return -1;
+    }
+  }
 }
