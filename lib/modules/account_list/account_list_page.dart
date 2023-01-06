@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:password_manager/common/widget/confirmation_dalog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
-import 'package:password_manager/modules/export/models/export_page.dart';
+import 'package:password_manager/modules/export/export_page.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
 import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
