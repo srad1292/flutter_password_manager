@@ -1,9 +1,14 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:password_manager/common/widget/error_dialog.dart';
+import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/utils/service_locator.dart';
+import 'package:path_provider/path_provider.dart';
 
 
 import 'exportdata.dart';
@@ -17,6 +22,8 @@ class ExportDataPage extends StatefulWidget {
 class _ExportDataPageState extends State<ExportDataPage> {
   late PasswordService _passwordService;
   late SettingsService _settingsService;
+
+  bool backingUp = false;
 
   @override
   void initState() {
@@ -58,9 +65,11 @@ class _ExportDataPageState extends State<ExportDataPage> {
 
   Widget _buildExportToFileButton() {
     return ElevatedButton(
-      onPressed: () async {
+      onPressed: backingUp ? null : () async {
         ExportData? data = await getExportData();
         if(data == null) { return; }
+
+        _writeDataToFile(data);
       },
       child: Text("Export to File"),
     );
@@ -77,11 +86,23 @@ class _ExportDataPageState extends State<ExportDataPage> {
     print("====GOT EXPORT DATA====");
     print(data.toJson());
 
-    print("====TESTING DECRYPT====");
-    ExportData decrypted = await _passwordService.decryptData(data);
-    print(decrypted.toJson());
+    return data;
+  }
 
+  Future<void> _writeDataToFile(ExportData data) async {
+    try {
+      Directory? directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) directory = await getExternalStorageDirectory();
+      if ((await directory?.exists() ?? false) == false) {
+        showErrorDialog(context: context, body: "Unable to find directory to save file.");
+      }
 
+      File file = File("${directory?.path}/account-backup.txt");
+      await file.writeAsString("${data.toJson()}");
+      await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backedup successfully.");
+    } catch (e) {
+      showErrorDialog(context: context, body: "Failed to write data to file.");
+    }
   }
 
 
