@@ -10,10 +10,20 @@ class ExportData {
    this.accounts = accounts.map((e) => Password.clone(e)).toList();
   }
 
+  ExportData.fromJson(Map<String, dynamic> json) {
+    superPassword = SuperPassword.fromPersistence(json);
+    accounts = [];
+    json['accounts'].forEach((e) {
+      accounts.add(Password.fromJson(e));
+    });
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['superPassword'] = this.superPassword.toPersistence();
     data['accounts'] = this.accounts.map((v) => v.toJson()).toList();
     return data;
   }
+
+
 }

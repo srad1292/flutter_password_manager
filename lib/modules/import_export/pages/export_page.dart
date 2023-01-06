@@ -1,4 +1,5 @@
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,14 +7,14 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:password_manager/common/widget/error_dialog.dart';
 import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
-import 'package:password_manager/modules/export/widgets/email_address_dialog.dart';
+import 'package:password_manager/modules/import_export/widgets/email_address_dialog.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:path_provider/path_provider.dart';
 
 
-import 'models/exportdata.dart';
+import '../models/exportdata.dart';
 
 
 class ExportDataPage extends StatefulWidget {
@@ -74,9 +75,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
 
     ExportData data = await _passwordService.getExportData();
 
-    print("====GOT EXPORT DATA====");
-    print(data.toJson());
-
     return data;
   }
 
@@ -92,23 +90,13 @@ class _ExportDataPageState extends State<ExportDataPage> {
     );
   }
 
-  Widget _buildExportViaEmailButton() {
-    return ElevatedButton(
-      onPressed: backingUp ? null : () async {
-        ExportData? data = await getExportData();
-        if(data == null) { return; }
-
-        _sendEmail(data);
-      },
-      child: Text("Export via Email"),
-    );
-  }
-
   Future<void> _writeDataToFile(ExportData data) async {
     try {
       File? file = await _getBackupDataFile('/storage/emulated/0/Download', data);
       if(file == null) { return; }
-      await file.writeAsString("${data.toJson()}");
+      print("====WRITING TO FILE====");
+      print(jsonEncode(data));
+      await file.writeAsString(jsonEncode(data));
       await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backedup successfully.");
     } catch (e) {
       showErrorDialog(context: context, body: "Failed to write data to file.");
@@ -128,7 +116,7 @@ class _ExportDataPageState extends State<ExportDataPage> {
 
   }
 
-  Widget _buildExportToEmailButton() {
+  Widget _buildExportViaEmailButton() {
     return ElevatedButton(
       onPressed: backingUp ? null : () async {
         ExportData? data = await getExportData();
@@ -136,7 +124,7 @@ class _ExportDataPageState extends State<ExportDataPage> {
 
         _sendEmail(data);
       },
-      child: Text("Export to File"),
+      child: Text("Export via Email"),
     );
   }
 

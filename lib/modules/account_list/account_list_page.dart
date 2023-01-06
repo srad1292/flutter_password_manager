@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:password_manager/common/widget/confirmation_dalog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
-import 'package:password_manager/modules/export/export_page.dart';
+import 'package:password_manager/modules/import_export/pages/export_page.dart';
+import 'package:password_manager/modules/import_export/services/import_service.dart';
 import 'package:password_manager/modules/settings/password_action.dart';
 import 'package:password_manager/modules/settings/settings_page.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/modules/shared/service/pm-permission-service.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
@@ -149,12 +151,15 @@ class _AccountListPageState extends State<AccountListPage> {
           ListTile(
             title: const Text('Import'),
             trailing: Icon(Icons.vertical_align_top),
-            onTap: () {
-              //TODO Add import functionality
-              // Note this makes me wonder about what if you import with duplicate ids
-              // should the import overwrite existing data.  I think in my head I decided that
-              // earlier but I need to think about it.
-              print("Import coming soon");
+            onTap: () async {
+              PmPermissionService permissionService = new PmPermissionService();
+              bool fileAccess = await permissionService.checkStoragePermission(context);
+              if(!fileAccess) { return; }
+              ImportService importService = new ImportService(context);
+              bool imported = await importService.importData();
+              if(imported) {
+                _loadPasswords(_passwordSearchController.text);
+              }
             },
           ),
           Divider(thickness: 2,),

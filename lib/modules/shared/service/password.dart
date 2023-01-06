@@ -1,6 +1,6 @@
 
 import 'package:encrypt/encrypt.dart';
-import 'package:password_manager/modules/export/models/exportdata.dart';
+import 'package:password_manager/modules/import_export/models/exportdata.dart';
 import 'package:password_manager/modules/shared/dao/password.dart';
 import 'package:password_manager/modules/shared/dao/super_password_dao.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
