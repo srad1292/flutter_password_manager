@@ -7,6 +7,7 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:password_manager/common/widget/error_dialog.dart';
 import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
+import 'package:password_manager/modules/import_export/services/export_service.dart';
 import 'package:password_manager/modules/import_export/widgets/email_address_dialog.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
@@ -73,7 +74,8 @@ class _ExportDataPageState extends State<ExportDataPage> {
       if(!canExport) { return null; }
     }
 
-    ExportData data = await _passwordService.getExportData();
+    ExportService exportService = new ExportService();
+    ExportData data = await exportService.getExportData();
 
     return data;
   }
@@ -97,7 +99,7 @@ class _ExportDataPageState extends State<ExportDataPage> {
       print("====WRITING TO FILE====");
       print(jsonEncode(data));
       await file.writeAsString(jsonEncode(data));
-      await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backedup successfully.");
+      await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backed up successfully.");
     } catch (e) {
       showErrorDialog(context: context, body: "Failed to write data to file.");
     }
@@ -111,7 +113,7 @@ class _ExportDataPageState extends State<ExportDataPage> {
       return null;
     }
 
-    return File("${directory?.path}/account-backup.txt");
+    return File("${directory?.path}/pm-account-backup.json");
 
 
   }

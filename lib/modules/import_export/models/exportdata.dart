@@ -11,7 +11,7 @@ class ExportData {
   }
 
   ExportData.fromJson(Map<String, dynamic> json) {
-    superPassword = SuperPassword.fromPersistence(json);
+    superPassword = SuperPassword.fromPersistence(json['superPassword']);
     accounts = [];
     json['accounts'].forEach((e) {
       accounts.add(Password.fromJson(e));

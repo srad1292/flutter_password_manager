@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:password_manager/common/widget/error_dialog.dart';
 import 'package:password_manager/common/widget/imported_super_request.dart';
 import 'package:password_manager/modules/import_export/models/exportdata.dart';
+import 'package:password_manager/modules/shared/service/encryptor_service.dart';
 
 class ImportService {
 
@@ -19,6 +20,7 @@ class ImportService {
 
     ExportData? data = await _parseData(file);
     if(data == null) { return false; }
+
 
     bool confirmedSuperPassword = await showImportedPasswordRequest(context: context, importedSuperPassword: data.superPassword.password);
     if(!confirmedSuperPassword) { return false; }
@@ -36,10 +38,10 @@ class ImportService {
 
       if (result != null) {
         String path = result.files.single.path ?? '';
-        if((path).endsWith(".txt") || path.endsWith('.text')) {
+        if((path).endsWith(".json")) {
           return File(path);
         } else {
-          await showErrorDialog(context: context, body: "File extension should be .txt or .text");
+          await showErrorDialog(context: context, body: "File extension should be .json");
           return null;
         }
       } else {
@@ -62,12 +64,33 @@ class ImportService {
       jsonEncode(jsonDecode(fileData));
       print("decoded");
       ExportData data = ExportData.fromJson(jsonDecode(fileData));
-      return data;
-    } catch(e) {
+      ExportData decrypted = await _decryptExportData(data);
+      print("Decrypted imported data");
+      print(decrypted.toJson());
+      return decrypted;
+    } catch(e, stacktrace) {
       print(e);
+      print(stacktrace);
       await showErrorDialog(context: context, body: "Data in selected file is not proper format");
       return null;
     }
+  }
+
+  Future<ExportData> _decryptExportData(ExportData data) async {
+    EncryptorService encryptorService = new EncryptorService();
+    await encryptorService.createEncryptor();
+
+    ExportData decrypted = ExportData(data.superPassword, data.accounts);
+    print("Super password before decryption");
+    print(data.superPassword.password);
+    decrypted.superPassword.password = encryptorService.decryptString(decrypted.superPassword.password);
+
+    decrypted.accounts.forEach((element) {
+      element.password = encryptorService.decryptString(element.password);
+      element.accountName = encryptorService.decryptString(element.accountName);
+    });
+
+    return decrypted;
   }
 
 
