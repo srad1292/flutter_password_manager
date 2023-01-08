@@ -10,8 +10,6 @@ class EncryptorService {
 
   Future<Encrypter> createEncryptor() async {
     Secret secret = await SecretLoader(secretPath: "secrets.json").load();
-    print("====GOT SECRET====");
-    print(secret.secureKey);
     final key = Key.fromUtf8(secret.secureKey);
 
     this.encryptor = Encrypter(AES(key));

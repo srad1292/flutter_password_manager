@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:password_manager/common/widget/confirmation_dalog.dart';
 import 'package:password_manager/common/widget/error_dialog.dart';
-import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/super_password/page/super_password.dart';

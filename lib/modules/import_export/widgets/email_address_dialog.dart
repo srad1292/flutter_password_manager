@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:password_manager/modules/shared/service/password.dart';
-import 'package:password_manager/utils/service_locator.dart';
 
 
 Future<String?> showEmailAddressDialog({required BuildContext context}) async {

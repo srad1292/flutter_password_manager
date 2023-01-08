@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:password_manager/modules/shared/service/password.dart';
-import 'package:password_manager/utils/service_locator.dart';
 
 bool showError = false;
 
@@ -21,7 +19,6 @@ Future<bool> showImportedPasswordRequest({required BuildContext context, require
 
 
 Widget doneButton(BuildContext dialogContext, BuildContext parentContext, StateSetter dialogSetState, TextEditingController input, String importedSuperPassword) {
-  PasswordService passwordService = serviceLocator.get();
   return TextButton(
     child: Text(
       "Okay",

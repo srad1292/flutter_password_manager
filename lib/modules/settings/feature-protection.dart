@@ -155,12 +155,8 @@ class _FeatureProtectionPageState extends State<FeatureProtectionPage> {
               guardImportPasswords: _importPasswordsToggle, guardExportPasswords: _exportPasswordsToggle
           );
 
-          print("New Settings");
-          print(newSettings.toString());
 
           await _settingsService.updateSettings(newSettings);
-          print("Updated Settings");
-          print(_settingsService.getSettings().toString());
 
           Navigator.of(context).pop();
         },

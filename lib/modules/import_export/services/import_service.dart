@@ -49,11 +49,8 @@ class ImportService {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
 
       if (result != null) {
-        result.paths.forEach((p) => print(p));
-        List<File> files = result.paths.map((path) { print(path); return File(path ?? '');}).toList();
+        List<File> files = result.paths.map((path) { return File(path ?? '');}).toList();
         if((files[0].path).endsWith(".json")) {
-          // await files[0].delete();
-          // files = result.paths.map((path) { print(path); return File(path ?? '');}).toList();
           return files[0];
         } else {
           await showErrorDialog(context: context, body: "File extension should be .json");
@@ -73,19 +70,11 @@ class ImportService {
   Future<ExportData?> _parseData(File file) async {
     try {
       var fileData = await file.readAsString();
-      print("FILE DATA");
-      print(fileData);
-      print("Going to decode");
       jsonEncode(jsonDecode(fileData));
-      print("decoded");
       ExportData data = ExportData.fromJson(jsonDecode(fileData));
       ExportData decrypted = await _decryptExportData(data);
-      print("Decrypted imported data");
-      print(decrypted.toJson());
       return decrypted;
-    } catch(e, stacktrace) {
-      print(e);
-      print(stacktrace);
+    } catch(e) {
       await showErrorDialog(context: context, body: "Data in selected file is not proper format");
       return null;
     }
@@ -96,8 +85,6 @@ class ImportService {
     await encryptorService.createEncryptor();
 
     ExportData decrypted = ExportData(data.superPassword, data.accounts);
-    print("Super password before decryption");
-    print(data.superPassword.password);
     decrypted.superPassword.password = encryptorService.decryptString(decrypted.superPassword.password);
 
     decrypted.accounts.forEach((element) {

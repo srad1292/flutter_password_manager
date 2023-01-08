@@ -48,12 +48,10 @@ class _JumpingDotsIndicatorState extends State<JumpingDotsProgressIndicator> wit
 
   initState() {
     super.initState();
-    print(" i am init state with $numberOfDots dots");
     for (int i = 0; i < numberOfDots; i++) {
       _addAnimationControllers();
       _buildAnimations(i);
       _addListOfDots(i);
-      print("did everything for dot $i");
     }
 
     controllers[0].forward();
@@ -69,7 +67,6 @@ class _JumpingDotsIndicatorState extends State<JumpingDotsProgressIndicator> wit
             .animate(controllers[index])
           ..addStatusListener((AnimationStatus status) {
             if (status == AnimationStatus.completed){
-              print("i completed and am reversing");
               controllers[index].reverse();
             }
             if (index == numberOfDots - 1 && status == AnimationStatus.dismissed) {

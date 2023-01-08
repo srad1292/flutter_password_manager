@@ -58,7 +58,6 @@ class _AccountListPageState extends State<AccountListPage> {
 
   void _setupPasswordSearch() {
     if(_passwordSearchController.text == _passwordSearchText) {
-      print("Search matches text so I am just returning");
       return;
     }
 
@@ -81,15 +80,12 @@ class _AccountListPageState extends State<AccountListPage> {
   }
 
   Future<void> _loadPasswords(String accountSearch) async {
-    print("I am within load passwords");
     try {
       List<Password> dbPasswords = await this._passwordService.getPasswordsFromPersistence(
         showSecret: _showHidden,
         accountSearch: accountSearch
       );
-      print("I found dbPasswords: ${dbPasswords.length}");
       if(mounted) {
-        print("I am setting state");
         setState(() {
           _passwords = dbPasswords;
         });

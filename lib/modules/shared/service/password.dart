@@ -31,7 +31,6 @@ class PasswordService {
 
   Future<SuperPassword?> createSuperPassword(SuperPassword password) async {
     int id = await this._superPasswordDao.addOrReplacePassword(password);
-    print("Create super password ID: $id");
     if(id != -1) {
       password.id = id;
       return password;
@@ -42,7 +41,6 @@ class PasswordService {
 
   Future<SuperPassword> updateSuperPassword(SuperPassword password) async {
     int id = await this._superPasswordDao.addOrReplacePassword(password);
-    print("Update super password ID: $id");
     if(id != 0) {
       password.id = id;
     }
@@ -53,7 +51,6 @@ class PasswordService {
   Future<bool> resetSuperPassword(SuperPassword password) async {
     int newId = await this._superPasswordDao.resetSuperPassword(password);
     bool didReset = newId >= 0;
-    print("Did i reset? $didReset");
     if(didReset) {
       this.superPassword = new SuperPassword.clone(password);
       this.superPassword?.id = newId;
@@ -73,7 +70,6 @@ class PasswordService {
 
   Future<Password?> createPassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
-    print("Create password ID: $id");
     if(id != -1) {
       password.id = id;
       return password;
@@ -88,7 +84,6 @@ class PasswordService {
 
   Future<Password> updatePassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
-    print("Update password ID: $id");
     if(id != 0) {
       password.id = id;
     }

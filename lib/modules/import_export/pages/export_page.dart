@@ -9,7 +9,6 @@ import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/import_export/services/export_service.dart';
 import 'package:password_manager/modules/import_export/widgets/email_address_dialog.dart';
-import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
@@ -25,7 +24,6 @@ class ExportDataPage extends StatefulWidget {
 }
 
 class _ExportDataPageState extends State<ExportDataPage> {
-  late PasswordService _passwordService;
   late SettingsService _settingsService;
 
   bool backingUp = false;
@@ -34,7 +32,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
   void initState() {
     super.initState();
     _settingsService = serviceLocator.get<SettingsService>();
-    _passwordService = serviceLocator.get<PasswordService>();
   }
 
 
