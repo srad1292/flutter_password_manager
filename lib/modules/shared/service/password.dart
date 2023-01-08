@@ -82,6 +82,10 @@ class PasswordService {
     return null;
   }
 
+  Future<int> bulkInsertPasswords(List<Password> accounts) async {
+    return await _passwordDao.bulkInsertPasswords(accounts);
+  }
+
   Future<Password> updatePassword(Password password) async {
     int id = await this._passwordDao.addOrReplacePassword(password);
     print("Update password ID: $id");

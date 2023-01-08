@@ -22,6 +22,23 @@ class PasswordDao {
     return -1;
   }
 
+  Future<int> bulkInsertPasswords(List<Password> passwords) async {
+    try {
+      Database? db = await DBProvider.db.database;
+      if(db == null) { return -1; }
+      var batch = db.batch();
+      passwords.forEach((element) {
+        batch.insert(DatabaseTables.PASSWORD, element.toPersistence(), conflictAlgorithm: ConflictAlgorithm.replace);
+      });
+
+      List<Object?> inserted = await batch.commit();
+      return inserted.length;
+
+    } catch(e) {
+      return -1;
+    }
+  }
+
   Future<Password?> getPasswordById({int passwordId = 0}) async {
     if(passwordId <= 0) { return null; }
 

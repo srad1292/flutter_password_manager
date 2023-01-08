@@ -5,8 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:password_manager/common/widget/error_dialog.dart';
 import 'package:password_manager/common/widget/imported_super_request.dart';
+import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/modules/import_export/models/exportdata.dart';
 import 'package:password_manager/modules/shared/service/encryptor_service.dart';
+import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/utils/service_locator.dart';
 
 class ImportService {
 
@@ -19,6 +22,7 @@ class ImportService {
     if(file == null) { return false; }
 
     ExportData? data = await _parseData(file);
+    file.delete();
     if(data == null) { return false; }
 
 
@@ -26,10 +30,18 @@ class ImportService {
     if(!confirmedSuperPassword) { return false; }
 
     // add accounts to database
+    PasswordService passwordService = serviceLocator.get<PasswordService>();
+    int insertedCount = await passwordService.bulkInsertPasswords(data.accounts);
 
     // show confirmation dialog if successful
+    if(insertedCount >= 0) {
+      await showSuccessDialog(context: context, title: "Import Success", body: "Imported $insertedCount accounts from backup.");
+      return true;
+    } else {
+      await showErrorDialog(context: context, body: "Saving accounts from backup failed");
+      return false;
+    }
 
-    return false; // return accountsImported;
   }
 
   Future<File?> _selectBackupFile() async {
@@ -37,9 +49,12 @@ class ImportService {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
 
       if (result != null) {
-        String path = result.files.single.path ?? '';
-        if((path).endsWith(".json")) {
-          return File(path);
+        result.paths.forEach((p) => print(p));
+        List<File> files = result.paths.map((path) { print(path); return File(path ?? '');}).toList();
+        if((files[0].path).endsWith(".json")) {
+          // await files[0].delete();
+          // files = result.paths.map((path) { print(path); return File(path ?? '');}).toList();
+          return files[0];
         } else {
           await showErrorDialog(context: context, body: "File extension should be .json");
           return null;
@@ -86,6 +101,7 @@ class ImportService {
     decrypted.superPassword.password = encryptorService.decryptString(decrypted.superPassword.password);
 
     decrypted.accounts.forEach((element) {
+      element.id = null;
       element.password = encryptorService.decryptString(element.password);
       element.accountName = encryptorService.decryptString(element.accountName);
     });

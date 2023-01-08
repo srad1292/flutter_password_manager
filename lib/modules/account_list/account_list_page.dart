@@ -150,7 +150,7 @@ class _AccountListPageState extends State<AccountListPage> {
           ),
           ListTile(
             title: const Text('Import'),
-            trailing: Icon(Icons.vertical_align_top),
+            trailing: Icon(Icons.download),
             onTap: () async {
               PmPermissionService permissionService = new PmPermissionService();
               bool fileAccess = await permissionService.checkStoragePermission(context);
@@ -158,6 +158,7 @@ class _AccountListPageState extends State<AccountListPage> {
               ImportService importService = new ImportService(context);
               bool imported = await importService.importData();
               if(imported) {
+                Navigator.of(context).pop();
                 _loadPasswords(_passwordSearchController.text);
               }
             },
@@ -165,7 +166,7 @@ class _AccountListPageState extends State<AccountListPage> {
           Divider(thickness: 2,),
           ListTile(
             title: const Text('Export'),
-            trailing: Icon(Icons.vertical_align_bottom),
+            trailing: Icon(Icons.publish),
             onTap: () async {
               Navigator.pop(context);
               await Navigator.of(context).push(

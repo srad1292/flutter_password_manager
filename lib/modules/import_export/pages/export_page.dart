@@ -96,8 +96,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
     try {
       File? file = await _getBackupDataFile('/storage/emulated/0/Download', data);
       if(file == null) { return; }
-      print("====WRITING TO FILE====");
-      print(jsonEncode(data));
       await file.writeAsString(jsonEncode(data));
       await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backed up successfully.");
     } catch (e) {
@@ -114,8 +112,6 @@ class _ExportDataPageState extends State<ExportDataPage> {
     }
 
     return File("${directory?.path}/pm-account-backup.json");
-
-
   }
 
   Widget _buildExportViaEmailButton() {
