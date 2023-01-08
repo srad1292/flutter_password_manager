@@ -153,6 +153,11 @@ class _AccountListPageState extends State<AccountListPage> {
             title: const Text('Import'),
             trailing: Icon(Icons.download),
             onTap: () async {
+
+              if(_settingsService.getSettings().guardImportPasswords) {
+                bool confirmed = await showPasswordRequest(context: context);
+                if(!confirmed) { return; }
+              }
               PmPermissionService permissionService = new PmPermissionService();
               bool fileAccess = await permissionService.checkStoragePermission(context);
               if(!fileAccess) { return; }
