@@ -1,4 +1,4 @@
-package com.sradfordm.password_manager
+package com.radfordsm.radsm_password_manager
 
 import io.flutter.embedding.android.FlutterActivity
 
