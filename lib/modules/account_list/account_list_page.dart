@@ -11,6 +11,7 @@ import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/pm-permission-service.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
+import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -146,7 +147,7 @@ class _AccountListPageState extends State<AccountListPage> {
         children: [
           ListTile(
             title: Text("Menu", style: Theme.of(context).textTheme.headline6,),
-            tileColor: Colors.lightBlueAccent,
+            tileColor: appBarLight,
           ),
           ListTile(
             title: const Text('Import'),

@@ -11,6 +11,7 @@ import 'package:password_manager/modules/import_export/services/export_service.d
 import 'package:password_manager/modules/import_export/widgets/email_address_dialog.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
+import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -57,7 +58,9 @@ class _ExportDataPageState extends State<ExportDataPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      SizedBox(height: 64),
                       _buildExportToFileButton(),
+                      SizedBox(height: 20),
                       _buildExportViaEmailButton()
                     ],
                   )
@@ -81,14 +84,32 @@ class _ExportDataPageState extends State<ExportDataPage> {
   }
 
   Widget _buildExportToFileButton() {
-    return ElevatedButton(
-      onPressed: backingUp ? null : () async {
-        ExportData? data = await getExportData();
-        if(data == null) { return; }
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 34),
+            child: ElevatedButton(
+              onPressed: backingUp ? null : () async {
+                ExportData? data = await getExportData();
+                if(data == null) { return; }
 
-        _writeDataToFile(data);
-      },
-      child: Text("Export to File"),
+                _writeDataToFile(data);
+              },
+              style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) {
+                    // If the button is pressed, return green, otherwise blue
+                    if (states.contains(MaterialState.pressed)) {
+                      return primaryLight;
+                    }
+                    return appBarLight;
+                  })
+              ),
+              child: Text("Export to File"),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -115,14 +136,32 @@ class _ExportDataPageState extends State<ExportDataPage> {
   }
 
   Widget _buildExportViaEmailButton() {
-    return ElevatedButton(
-      onPressed: backingUp ? null : () async {
-        ExportData? data = await getExportData();
-        if(data == null) { return; }
+    return Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 34),
+              child: ElevatedButton(
+                onPressed: backingUp ? null : () async {
+                  ExportData? data = await getExportData();
+                  if(data == null) { return; }
 
-        _sendEmail(data);
-      },
-      child: Text("Export via Email"),
+                  _sendEmail(data);
+                },
+                style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) {
+                    // If the button is pressed, return green, otherwise blue
+                    if (states.contains(MaterialState.pressed)) {
+                      return primaryLight;
+                    }
+                    return appBarLight;
+                  })
+                ),
+                child: Text("Export via Email"),
+              ),
+            ),
+          )
+        ]
     );
   }
 
