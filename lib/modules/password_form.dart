@@ -245,7 +245,7 @@ class _PasswordFormState extends State<PasswordForm> {
     try {
       await saveFunction(password);
       setState(() { saving = false; });
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     } catch(err) {
       await showErrorDialog(context: context, body: "Saving password failed.  Please try again.");
       setState(() { saving = false; });

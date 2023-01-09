@@ -3,8 +3,8 @@ import 'package:flutter/widgets.dart';
 class SizeConfig {
   static late double _screenWidth;
   static late double _screenHeight;
-  static double _blockWidth = 0;
-  static double _blockHeight = 0;
+  static double _blockWidth = 3.84;
+  static double _blockHeight = 7.84;
 
   static late double textMultiplier;
   static late double imageSizeMultiplier;
@@ -31,10 +31,10 @@ class SizeConfig {
     _blockWidth = _screenWidth / 100;
     _blockHeight = _screenHeight / 100;
 
-    textMultiplier = _blockHeight;
-    imageSizeMultiplier = _blockWidth;
-    heightMultiplier = _blockHeight;
-    widthMultiplier = _blockWidth;
+    textMultiplier = _blockHeight == 0 ? 7.84 : _blockHeight;
+    imageSizeMultiplier = _blockWidth == 0 ? 3.84 : _blockWidth;
+    heightMultiplier = _blockHeight == 0 ? 7.84 : _blockHeight;
+    widthMultiplier = _blockWidth == 0 ? 3.84 : _blockWidth;
 
     print("(Block Width: $_blockWidth, Block Height: $_blockHeight");
     print(_screenWidth);

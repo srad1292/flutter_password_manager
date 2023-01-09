@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'app.dart';
 import 'utils/service_locator.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   setupServiceLocator();

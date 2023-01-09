@@ -25,6 +25,7 @@ class AccountListPage extends StatefulWidget {
 class _AccountListPageState extends State<AccountListPage> {
   late PasswordService _passwordService;
   List<Password> _passwords = [];
+  bool passwordsExist = false;
   late TextEditingController _passwordSearchController;
   late SettingsService _settingsService;
   String _passwordSearchText = '';
@@ -44,6 +45,7 @@ class _AccountListPageState extends State<AccountListPage> {
       _loadPasswords("").then((_) {
         setState(() {
           _loading = false;
+          passwordsExist = _passwords.isNotEmpty;
         });
       });
     });
@@ -108,7 +110,13 @@ class _AccountListPageState extends State<AccountListPage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Passwords")
+            title: Text(
+              "Passwords",
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 3 * SizeConfig.textMultiplier,
+              ),
+            )
           ),
           drawer: _buildAccountListDrawer(),
           body: Padding(
@@ -122,13 +130,19 @@ class _AccountListPageState extends State<AccountListPage> {
               size: 9 * SizeConfig.widthMultiplier,
             ),
             onPressed: () async {
-              await Navigator.of(context).push(
+              bool created = await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
                   return PasswordForm();
                 }),
               );
 
-              await this._loadPasswords(_passwordSearchText);
+              this._loadPasswords(_passwordSearchText).then((_) {
+                if(created && !passwordsExist) {
+                  setState(() {
+                    passwordsExist = true;
+                  });
+                }
+              });
             },
           ),
         )
@@ -161,7 +175,12 @@ class _AccountListPageState extends State<AccountListPage> {
               bool imported = await importService.importData();
               if(imported) {
                 Navigator.of(context).pop();
-                _loadPasswords(_passwordSearchController.text);
+                _passwordSearchController.text = '';
+                _loadPasswords('').then((_) {
+                  setState(() {
+                    passwordsExist = _passwords.isNotEmpty;
+                  });
+                });
               }
             },
           ),
@@ -213,7 +232,7 @@ class _AccountListPageState extends State<AccountListPage> {
   }
   
   Widget _buildPasswordScreen() {
-    if((_passwords).length == 0) {
+    if(!passwordsExist) {
       return _buildEmptyListScreen();
     } else {
       return _buildHasPasswordScreen();
@@ -239,6 +258,10 @@ class _AccountListPageState extends State<AccountListPage> {
           flex: 2,
           child: _buildShowHiddenSwitch()
         ),
+        _passwords.isEmpty ? Flexible(
+          flex: 1,
+          child: _buildNoMatchingPasswords()
+        ) : Container(),
         Flexible(
             flex: 8,
             child: _buildPasswordList()
@@ -295,6 +318,10 @@ class _AccountListPageState extends State<AccountListPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildNoMatchingPasswords() {
+    return Text("No passwords found");
   }
   
   Widget _buildPasswordList() {
@@ -438,7 +465,12 @@ class _AccountListPageState extends State<AccountListPage> {
       this._loadPasswords(_passwordSearchText);
     } else if(result == PasswordAction.delete) {
       await _passwordService.deletePassword(passwordID: password.id ?? -1);
-      _loadPasswords(_passwordSearchText);
+      _passwordSearchController.text = "";
+      _loadPasswords(_passwordSearchText).then((_) {
+        setState(() {
+          passwordsExist = _passwords.isNotEmpty;
+        });
+      });
     }
   }
 

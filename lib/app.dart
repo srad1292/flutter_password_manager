@@ -10,6 +10,9 @@ class PasswordManagerApp extends StatefulWidget {
 }
 
 class _PasswordManagerAppState extends State<PasswordManagerApp> {
+
+  double lastHeight = -1;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -17,6 +20,11 @@ class _PasswordManagerAppState extends State<PasswordManagerApp> {
         return OrientationBuilder(
           builder: (context, orientation) {
             SizeConfig().init(constraints, orientation);
+            if(lastHeight == 0 && SizeConfig.heightMultiplier != 0) {
+              print("Height was 0 and now is not so I am rebuilding");
+              setState(() {});
+            }
+            lastHeight = SizeConfig.heightMultiplier;
             return MaterialApp(
               title: 'Password Manager',
               theme: AppTheme.lightTheme,
