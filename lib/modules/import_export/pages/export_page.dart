@@ -9,6 +9,7 @@ import 'package:password_manager/common/widget/password_manager_dialog.dart';
 import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/import_export/services/export_service.dart';
 import 'package:password_manager/modules/import_export/widgets/email_address_dialog.dart';
+import 'package:password_manager/modules/shared/service/pm-permission-service.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/styling/colors.dart';
 import 'package:password_manager/utils/service_locator.dart';
@@ -25,6 +26,7 @@ class ExportDataPage extends StatefulWidget {
 
 class _ExportDataPageState extends State<ExportDataPage> {
   late SettingsService _settingsService;
+  late PmPermissionService _permissionService;
 
   bool backingUp = false;
 
@@ -32,6 +34,7 @@ class _ExportDataPageState extends State<ExportDataPage> {
   void initState() {
     super.initState();
     _settingsService = serviceLocator.get<SettingsService>();
+    _permissionService = new PmPermissionService();
   }
 
 
@@ -91,6 +94,10 @@ class _ExportDataPageState extends State<ExportDataPage> {
                 ExportData? data = await getExportData();
                 if(data == null) { return; }
 
+                bool fileAccess = await _permissionService.checkStoragePermission(context);
+                print("Export page -> Storage Access: $fileAccess");
+                if(!fileAccess) { return; }
+
                 _writeDataToFile(data);
               },
               style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
@@ -116,7 +123,9 @@ class _ExportDataPageState extends State<ExportDataPage> {
       if(file == null) { return; }
       await file.writeAsString(jsonEncode(data));
       await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backed up successfully.");
-    } catch (e) {
+    } catch (e, stacktrace) {
+      print(e);
+      print(stacktrace);
       showErrorDialog(context: context, body: "Failed to write data to file.");
     }
   }

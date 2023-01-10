@@ -8,11 +8,12 @@ class PmPermissionService {
   PmPermissionService();
 
   Future<bool> checkStoragePermission(BuildContext context) async {
-    var storagePermission = await Permission.storage.status;
+    var storagePermission = await Permission.manageExternalStorage.status;
+    print("Storage status: $storagePermission");
     if(storagePermission == PermissionStatus.granted || storagePermission == PermissionStatus.limited) {
       return true;
     } else if (storagePermission == PermissionStatus.denied) {
-      var newPermission = await Permission.storage.request();
+      var newPermission = await Permission.manageExternalStorage.request();
       return newPermission == PermissionStatus.granted || newPermission == PermissionStatus.limited;
     } else if(storagePermission == PermissionStatus.permanentlyDenied) {
       await _androidOpenSettings(context, "Permission Denied", "Access to files has been denied. Please enable in settings to continue");
