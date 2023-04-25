@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
+import 'package:password_manager/modules/shared/service/password_request_service.dart';
 import 'package:password_manager/utils/service_locator.dart';
 
 bool showError = false;
 
 Future<bool> showPasswordRequest({required BuildContext context}) async {
+  PasswordRequestService passwordRequestService = serviceLocator.get<PasswordRequestService>();
+  if(passwordRequestService.checkIfPasswordRecentlyEntered()) {
+    return true;
+  }
+
   showError = false;
-  Widget dialog = passwordDialog(context);
+  Widget dialog = passwordDialog(context, passwordRequestService);
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -20,7 +26,7 @@ Future<bool> showPasswordRequest({required BuildContext context}) async {
 }
 
 
-Widget doneButton(BuildContext dialogContext, BuildContext parentContext, StateSetter dialogSetState, TextEditingController input) {
+Widget doneButton(BuildContext dialogContext, BuildContext parentContext, StateSetter dialogSetState, TextEditingController input, PasswordRequestService passwordRequestService) {
   PasswordService passwordService = serviceLocator.get();
   return TextButton(
     child: Text(
@@ -36,6 +42,7 @@ Widget doneButton(BuildContext dialogContext, BuildContext parentContext, StateS
         dialogSetState(() {
           showError = false;
         });
+        passwordRequestService.setPasswordEnteredTime();
         Navigator.of(parentContext).pop(true);
       } else {
         dialogSetState(() {
@@ -64,7 +71,7 @@ Widget cancelButton(BuildContext parentContext) {
 
 
 
-Widget passwordDialog(BuildContext parentContext) {
+Widget passwordDialog(BuildContext parentContext, PasswordRequestService passwordRequestService) {
   TextEditingController passwordController = new TextEditingController();
   bool isPasswordVisible = false;
 
@@ -117,7 +124,9 @@ Widget passwordDialog(BuildContext parentContext) {
             )
           ],
         ),
-        actions: [cancelButton(parentContext), doneButton(dialogContext, parentContext, dialogSetState, passwordController)],
+        actions: [
+          cancelButton(parentContext),
+          doneButton(dialogContext, parentContext, dialogSetState, passwordController, passwordRequestService)],
       );
     }
   );

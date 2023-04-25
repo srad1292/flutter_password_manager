@@ -6,6 +6,10 @@ class PasswordRequestService {
   List<PasswordRequest> requestSettings = [];
   PasswordRequestDao _passwordRequestDao = new PasswordRequestDao();
 
+  DateTime? superPasswordCacheTimer;
+
+  PasswordRequestService();
+
   Future<List<PasswordRequest>> getRequestSettings() async {
     if(requestSettings.length > 0) {
       return this.requestSettings;
@@ -28,6 +32,20 @@ class PasswordRequestService {
     }
 
     return succeeded;
+  }
+
+  bool checkIfPasswordRecentlyEntered() {
+    if(superPasswordCacheTimer != null) {
+      DateTime now = DateTime.now();
+      if(now.difference(superPasswordCacheTimer!).inSeconds < 80) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void setPasswordEnteredTime() {
+    superPasswordCacheTimer = DateTime.now();
   }
 
 }
