@@ -28,6 +28,7 @@ class _PasswordFormState extends State<PasswordForm> {
   late TextEditingController _passwordController;
   late  bool _isSecret;
   bool _isPasswordVisible = false;
+  late bool _isCreateForm;
 
   bool saving = false;
   bool formValid = false;
@@ -47,6 +48,8 @@ class _PasswordFormState extends State<PasswordForm> {
     _passwordController = new TextEditingController();
     _passwordController.text = widget.password?.password ?? '';
     _isSecret = widget.password?.isSecret == true;
+
+    _isCreateForm = widget.password?.id == null;
 
     validateForm();
 
@@ -178,7 +181,11 @@ class _PasswordFormState extends State<PasswordForm> {
             // errorText: _passwordInputError.isEmpty ? null : _passwordInputError,
             suffixIcon: IconButton(
               icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility),
-              onPressed: () {
+              onPressed: () async {
+                if(!_isCreateForm && _settingsService.getSettings().guardViewPassword) {
+                    bool canViewPassword = await showPasswordRequest(context: context);
+                    if(!canViewPassword) { return; }
+                }
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
@@ -240,7 +247,7 @@ class _PasswordFormState extends State<PasswordForm> {
         isSecret: _isSecret
     );
 
-    Function saveFunction = widget.password?.id == null ? _passwordService.createPassword : _passwordService.updatePassword;
+    Function saveFunction = _isCreateForm ? _passwordService.createPassword : _passwordService.updatePassword;
 
     try {
       await saveFunction(password);

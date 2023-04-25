@@ -23,7 +23,7 @@ class _InitializationPageState extends State<InitializationPage> {
   void initState() {
     super.initState();
 
-    SchedulerBinding.instance?.addPostFrameCallback((_) async {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
       SettingsService settingsService = serviceLocator.get();
       await settingsService.restoreSettings();
       _determineNavigationPath();

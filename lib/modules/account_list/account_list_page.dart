@@ -41,7 +41,7 @@ class _AccountListPageState extends State<AccountListPage> {
     _passwordSearchController = new TextEditingController();
     _passwordSearchController.addListener(_setupPasswordSearch);
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadPasswords("").then((_) {
         setState(() {
           _loading = false;
