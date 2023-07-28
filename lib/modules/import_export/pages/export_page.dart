@@ -133,12 +133,16 @@ class _ExportDataPageState extends State<ExportDataPage> {
   Future<File?> _getBackupDataFile(String pathToTryFirst, ExportData data) async {
     Directory? directory = Directory(pathToTryFirst);
     if (!await directory.exists()) directory = await getExternalStorageDirectory();
+    // Directory? directory = await getExternalStorageDirectory();
     if ((await directory?.exists() ?? false) == false) {
       showErrorDialog(context: context, body: "Unable to find directory to save file.");
       return null;
     }
 
-    return File("${directory?.path}/pm-account-backup.json");
+    print('Got following path: ${directory?.path}');
+    File file = File("${directory?.path}/pm-account-backup.json");
+    await file.writeAsString(jsonEncode(data));
+    return file;
   }
 
   Widget _buildExportViaEmailButton() {
@@ -193,11 +197,13 @@ class _ExportDataPageState extends State<ExportDataPage> {
         await FlutterEmailSender.send(email);
         await showSuccessDialog(context: context, title: "Success", body: "${data.accounts.length} accounts backed-up successfully.");
       } catch (e) {
+        print("_sendEmail send catch block");
+        print(e.toString());
         showErrorDialog(context: context, body: "Unable to open email client. Make sure to set up an email client");
       }
 
     } catch (e) {
-      showErrorDialog(context: context, body: "Failed to write data to file.");
+      showErrorDialog(context: context, body: "Failed to send email");
     }
 
   }

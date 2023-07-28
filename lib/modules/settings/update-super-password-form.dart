@@ -182,8 +182,12 @@ class _UpdateSuperPasswordFormState extends State<UpdateSuperPasswordForm> {
 
   void saveSuperPassword() async {
     setState(() { saving = true; });
+
+    SuperPassword? superPassword = await _passwordService.getSuperPassword();
+
     SuperPassword password = new SuperPassword(
-        password: _newPasswordController.text.trim(),
+      password: _newPasswordController.text.trim(),
+      id: superPassword?.id
     );
 
     Function saveFunction = _passwordService.updateSuperPassword;
