@@ -238,13 +238,17 @@ class _PasswordFormState extends State<PasswordForm> {
 
   void savePassword() async {
     setState(() { saving = true; });
+    var now = DateTime.now().toUtc();
+    String isoDate = now.toIso8601String();
     Password password = new Password(
         id: widget.password?.id,
         accountName: _accountNameController.text,
         email: _emailController.text,
         username: _usernameController.text,
         password: _passwordController.text,
-        isSecret: _isSecret
+        isSecret: _isSecret,
+        createdAt: (widget.password?.createdAt ?? '').isEmpty ? isoDate : (widget.password?.createdAt ?? isoDate),
+        updatedAt: isoDate,
     );
 
     Function saveFunction = _isCreateForm ? _passwordService.createPassword : _passwordService.updatePassword;

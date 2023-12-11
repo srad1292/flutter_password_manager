@@ -2,6 +2,7 @@
 
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/utils/database.dart';
+import 'package:password_manager/utils/database_columns.dart';
 import 'package:password_manager/utils/database_tables.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -62,7 +63,7 @@ class PasswordDao {
     try {
       List<Map<String, dynamic>>? dbPasswords = await db?.query(
         DatabaseTables.PASSWORD,
-        where: showSecret ? "account_name like ?" : "is_secret = ? and account_name like ?",
+        where: showSecret ? "${DatabaseColumn.AccountName} like ?" : "${DatabaseColumn.IsSecret} = ? and ${DatabaseColumn.AccountName} like ?",
         whereArgs: showSecret ? ["%${accountSearch.toLowerCase()}%"] : [0, "%${accountSearch.toLowerCase()}%"]
       );
       if(dbPasswords != null && dbPasswords.length > 0) {

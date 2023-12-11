@@ -5,10 +5,12 @@ class Password {
   late String username;
   late String password;
   late bool isSecret;
+  late String createdAt;
+  late String updatedAt;
 
   Password({
     this.id, this.accountName = '', this.email = '', this.username = '',
-    this.password = '', this.isSecret=false,
+    this.password = '', this.createdAt = '', this.updatedAt = '', this.isSecret=false,
   });
 
   Password.clone(Password password) {
@@ -18,6 +20,8 @@ class Password {
     this.username = password.username;
     this.password = password.password;
     this.isSecret = password.isSecret;
+    this.createdAt = password.createdAt;
+    this.updatedAt = password.updatedAt;
   }
 
   Map<String, dynamic> toPersistence() =>
@@ -28,6 +32,8 @@ class Password {
     'username': this.username,
     'password': this.password,
     'is_secret': this.isSecret == true ? 1 : 0,
+    'created_at': this.createdAt,
+    'updated_at': this.updatedAt,
   };
 
   Map<String, dynamic> toJson() =>
@@ -38,6 +44,8 @@ class Password {
     'username': this.username,
     'password': this.password,
     'isSecret': this.isSecret,
+    'created_at': this.createdAt,
+    'updated_at': this.updatedAt,
   };
 
   factory Password.fromPersistence(Map<String, dynamic> json) {
@@ -48,6 +56,8 @@ class Password {
       username: json['username'],
       password: json['password'],
       isSecret: json['is_secret'] == 1 ? true : false,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
   }
 
@@ -59,6 +69,8 @@ class Password {
       username: json['username'],
       password: json['password'],
       isSecret: json['isSecret'],
+      createdAt: json['createdAt'] ?? '',
+      updatedAt: json['updatedAt'] ?? '',
     );
   }
 
@@ -72,6 +84,8 @@ class Password {
       username: ${this.username}, 
       password: ${this.password}, 
       isSecret: ${this.isSecret}, 
+      createdAt: ${this.createdAt},
+      updatedAt: ${this.updatedAt},
     )''';
   }
 }

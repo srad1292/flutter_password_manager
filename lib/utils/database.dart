@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:password_manager/utils/database_columns.dart';
 import 'package:password_manager/utils/database_tables.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-const int DB_VERSION = 1;
+const int DB_VERSION = 2;
 
 class DBProvider {
   DBProvider._();
@@ -24,7 +25,8 @@ class DBProvider {
     return await openDatabase(path,
         version: DB_VERSION,
         onOpen: (db) {},
-        onCreate: _createCallback
+        onCreate: _createCallback,
+        onUpgrade: _updateCallback,
     );
   }
 
@@ -32,6 +34,16 @@ class DBProvider {
     await db.execute(_getPasswordSchema());
     await db.execute(_getSuperPasswordSchema());
     await db.execute(_getPasswordRequestSchema());
+  }
+
+  void _updateCallback(Database db, int oldVersion, int newVersion) {
+    if(oldVersion == 1) {
+      var now = DateTime.now().toUtc();
+      String isoDate = now.toIso8601String();
+      db.execute("ALTER TABLE ${DatabaseTables.PASSWORD} ADD COLUMN ${DatabaseColumn.CreatedAt} TEXT DEFAULT '$isoDate';");
+      db.execute("ALTER TABLE ${DatabaseTables.PASSWORD} ADD COLUMN ${DatabaseColumn.UpdatedAt} TEXT DEFAULT '$isoDate';");
+    }
+
   }
 
 

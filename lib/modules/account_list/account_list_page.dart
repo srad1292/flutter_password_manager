@@ -87,6 +87,7 @@ class _AccountListPageState extends State<AccountListPage> {
         showSecret: _showHidden,
         accountSearch: accountSearch
       );
+      dbPasswords.forEach((element) {print(element.toString());});
       if(mounted) {
         setState(() {
           _passwords = dbPasswords;
