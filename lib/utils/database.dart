@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:password_manager/utils/database_columns.dart';
 import 'package:password_manager/utils/database_tables.dart';
+import 'package:password_manager/utils/date_functions.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -38,8 +39,7 @@ class DBProvider {
 
   void _updateCallback(Database db, int oldVersion, int newVersion) {
     if(oldVersion == 1) {
-      var now = DateTime.now().toUtc();
-      String isoDate = now.toIso8601String();
+      String isoDate = DateFunctions.currentUtcTimeStamp();
       db.execute("ALTER TABLE ${DatabaseTables.PASSWORD} ADD COLUMN ${DatabaseColumn.CreatedAt} TEXT DEFAULT '$isoDate';");
       db.execute("ALTER TABLE ${DatabaseTables.PASSWORD} ADD COLUMN ${DatabaseColumn.UpdatedAt} TEXT DEFAULT '$isoDate';");
     }

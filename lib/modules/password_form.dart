@@ -4,6 +4,7 @@ import 'package:password_manager/common/widget/password_request_dialog.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
+import 'package:password_manager/utils/date_functions.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -104,6 +105,8 @@ class _PasswordFormState extends State<PasswordForm> {
       padding: EdgeInsets.only(top: 8),
       child: Column(
         children: [
+          if(!_isCreateForm)
+            _buildLastUpdatedDisplay(),
           ..._buildFormFields(),
           _buildSubmitButton()
         ],
@@ -236,6 +239,13 @@ class _PasswordFormState extends State<PasswordForm> {
     );
   }
 
+  Widget _buildLastUpdatedDisplay() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
+      child: Text("Last Updated: ${DateFunctions.iso8601ToDisplay(widget.password?.updatedAt ?? '')}"),
+    );
+  }
+
   void savePassword() async {
     setState(() { saving = true; });
     var now = DateTime.now().toUtc();
@@ -247,7 +257,7 @@ class _PasswordFormState extends State<PasswordForm> {
         username: _usernameController.text,
         password: _passwordController.text,
         isSecret: _isSecret,
-        createdAt: (widget.password?.createdAt ?? '').isEmpty ? isoDate : (widget.password?.createdAt ?? isoDate),
+        createdAt: _isCreateForm ? isoDate : (widget.password?.createdAt ?? isoDate),
         updatedAt: isoDate,
     );
 

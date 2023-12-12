@@ -88,4 +88,13 @@ class Password {
       updatedAt: ${this.updatedAt},
     )''';
   }
+
+  String toDateTest() {
+    return '''
+    (
+      accountName: ${this.accountName}, 
+      createdAt: ${this.createdAt},
+      updatedAt: ${this.updatedAt},
+    )''';
+  }
 }

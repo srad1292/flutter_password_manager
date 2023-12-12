@@ -12,6 +12,8 @@ import 'package:password_manager/modules/shared/service/password.dart';
 import 'package:password_manager/modules/shared/service/pm-permission-service.dart';
 import 'package:password_manager/modules/shared/service/settings.dart';
 import 'package:password_manager/styling/colors.dart';
+import 'package:password_manager/utils/database_columns.dart';
+import 'package:password_manager/utils/date_functions.dart';
 import 'package:password_manager/utils/service_locator.dart';
 import 'package:password_manager/utils/size_config.dart';
 
@@ -32,6 +34,7 @@ class _AccountListPageState extends State<AccountListPage> {
   bool _showHidden = false;
   bool _loading = true;
   Timer? _debounce;
+  String _orderBy = DatabaseColumn.AccountName;
 
   @override
   void initState() {
@@ -85,9 +88,10 @@ class _AccountListPageState extends State<AccountListPage> {
     try {
       List<Password> dbPasswords = await this._passwordService.getPasswordsFromPersistence(
         showSecret: _showHidden,
-        accountSearch: accountSearch
+        accountSearch: accountSearch,
+        orderBy: _orderBy
       );
-      dbPasswords.forEach((element) {print(element.toString());});
+      // dbPasswords.forEach((element) {print(element.toDateTest());});
       if(mounted) {
         setState(() {
           _passwords = dbPasswords;
@@ -131,14 +135,14 @@ class _AccountListPageState extends State<AccountListPage> {
               size: 9 * SizeConfig.widthMultiplier,
             ),
             onPressed: () async {
-              bool created = await Navigator.of(context).push(
+              bool? created = await Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
                   return PasswordForm();
                 }),
               );
 
               this._loadPasswords(_passwordSearchText).then((_) {
-                if(created && !passwordsExist) {
+                if(created == true && !passwordsExist) {
                   setState(() {
                     passwordsExist = true;
                   });
@@ -257,7 +261,16 @@ class _AccountListPageState extends State<AccountListPage> {
         ),
         Flexible(
           flex: 2,
-          child: _buildShowHiddenSwitch()
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 3.5 * SizeConfig.widthMultiplier),
+            child: Row(
+              children: [
+                _buildShowHiddenSwitch(),
+                Spacer(),
+                _buildOrderBy()
+              ],
+            )
+          )
         ),
         _passwords.isEmpty ? Flexible(
           flex: 1,
@@ -288,37 +301,62 @@ class _AccountListPageState extends State<AccountListPage> {
   }
 
   Widget _buildShowHiddenSwitch() {
-    return Padding(
-      padding: EdgeInsets.only(left: 3.5 * SizeConfig.widthMultiplier),
-      child: Row(
-        children: [
-          Text(
-              "Show Secret Passwords?",
-              style: Theme.of(context).textTheme.subtitle2
-          ),
-          Switch(
-            value: _showHidden,
-            onChanged: (newValue) async {
-              if(_settingsService.getSettings().guardShowSecretPasswords && newValue == true) {
-                bool confirmed = await showPasswordRequest(context: context);
-                if(!confirmed) {
-                  setState(() {
-                    _showHidden = false;
-                  });
-                  return;
-                }
+    return Row(
+      children: [
+        Text(
+            "Show Secret Passwords?",
+            style: Theme.of(context).textTheme.subtitle2
+        ),
+        Switch(
+          value: _showHidden,
+          onChanged: (newValue) async {
+            if(_settingsService.getSettings().guardShowSecretPasswords && newValue == true) {
+              bool confirmed = await showPasswordRequest(context: context);
+              if(!confirmed) {
+                setState(() {
+                  _showHidden = false;
+                });
+                return;
               }
-              setState(() {
-                _showHidden = newValue;
-              });
-              this._loadPasswords(_passwordSearchText);
-            },
-            inactiveThumbColor: Theme.of(context).toggleableActiveColor,
-            inactiveTrackColor: Colors.black12,
-          ),
-        ],
-      ),
+            }
+            setState(() {
+              _showHidden = newValue;
+            });
+            this._loadPasswords(_passwordSearchText);
+          },
+          inactiveThumbColor: Theme.of(context).toggleableActiveColor,
+          inactiveTrackColor: Colors.black12,
+        ),
+      ],
     );
+  }
+
+  Widget _buildOrderBy() {
+    return Row(
+      children: [
+        Text(
+            "Sort: ",
+            style: Theme.of(context).textTheme.subtitle2
+        ),
+        GestureDetector(
+          onTap: orderByToggle,
+          child: Text(
+              _orderBy == "${DatabaseColumn.UpdatedAt}" ? "Alphabetically" : "Last Updated",
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w500
+              )
+          ),
+        ),
+      ],
+    );
+  }
+
+  void orderByToggle() {
+    setState(() {
+      _orderBy = _orderBy == "${DatabaseColumn.UpdatedAt}" ? "${DatabaseColumn.AccountName}" : "${DatabaseColumn.UpdatedAt}";
+    });
+    _loadPasswords(_passwordSearchText);
   }
 
   Widget _buildNoMatchingPasswords() {
@@ -535,6 +573,22 @@ class _AccountListPageState extends State<AccountListPage> {
                 child: Text(password.password),
               )
             ]
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 2.5 * SizeConfig.heightMultiplier),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    "Last Updated",
+                    style: Theme.of(context).textTheme.subtitle2
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
+                  child: Text(DateFunctions.iso8601ToDisplay(password.updatedAt)),
+                )
+              ]
           ),
         ),
       ],

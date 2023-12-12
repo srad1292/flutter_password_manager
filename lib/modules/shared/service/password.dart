@@ -3,6 +3,7 @@ import 'package:password_manager/modules/shared/dao/password.dart';
 import 'package:password_manager/modules/shared/dao/super_password_dao.dart';
 import 'package:password_manager/modules/shared/model/password.dart';
 import 'package:password_manager/modules/super_password/page/super_password.dart';
+import 'package:password_manager/utils/database_columns.dart';
 
 class PasswordService {
 
@@ -60,8 +61,8 @@ class PasswordService {
   }
 
 
-  Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = ''}) async {
-    return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch);
+  Future<List<Password>> getPasswordsFromPersistence({bool showSecret = false, String accountSearch = '', String orderBy = DatabaseColumn.AccountName}) async {
+    return await this._passwordDao.getAllPasswords(showSecret: showSecret, accountSearch: accountSearch, orderBy: orderBy);
   }
 
   Future<Password?> getPasswordById({int passwordId = 0}) async {
