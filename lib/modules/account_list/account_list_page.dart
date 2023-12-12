@@ -161,7 +161,7 @@ class _AccountListPageState extends State<AccountListPage> {
         padding: EdgeInsets.zero,
         children: [
           ListTile(
-            title: Text("Menu", style: Theme.of(context).textTheme.headline6,),
+            title: Text("Menu", style: Theme.of(context).textTheme.titleLarge,),
             tileColor: appBarLight,
           ),
           ListTile(
@@ -305,7 +305,7 @@ class _AccountListPageState extends State<AccountListPage> {
       children: [
         Text(
             "Show Secret Passwords?",
-            style: Theme.of(context).textTheme.subtitle2
+            style: Theme.of(context).textTheme.titleSmall
         ),
         Switch(
           value: _showHidden,
@@ -336,7 +336,7 @@ class _AccountListPageState extends State<AccountListPage> {
       children: [
         Text(
             "Sort: ",
-            style: Theme.of(context).textTheme.subtitle2
+            style: Theme.of(context).textTheme.titleSmall
         ),
         GestureDetector(
           onTap: orderByToggle,
@@ -411,7 +411,7 @@ class _AccountListPageState extends State<AccountListPage> {
           ),
           Text(
             _getEmailOrUsername(password),
-            style: Theme.of(context).textTheme.subtitle1
+            style: Theme.of(context).textTheme.titleMedium
           )
         ],
       ),
@@ -534,7 +534,7 @@ class _AccountListPageState extends State<AccountListPage> {
             children: [
               Text(
                 "Email",
-                style: Theme.of(context).textTheme.subtitle2
+                style: Theme.of(context).textTheme.titleSmall
               ),
               Padding(
                 padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
@@ -550,7 +550,7 @@ class _AccountListPageState extends State<AccountListPage> {
             children: [
               Text(
                 "Username",
-                style: Theme.of(context).textTheme.subtitle2
+                style: Theme.of(context).textTheme.titleSmall
               ),
               Padding(
                 padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
@@ -566,7 +566,7 @@ class _AccountListPageState extends State<AccountListPage> {
             children: [
               Text(
                 "Password",
-                style: Theme.of(context).textTheme.subtitle2
+                style: Theme.of(context).textTheme.titleSmall
               ),
               Padding(
                 padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),
@@ -582,7 +582,7 @@ class _AccountListPageState extends State<AccountListPage> {
               children: [
                 Text(
                     "Last Updated",
-                    style: Theme.of(context).textTheme.subtitle2
+                    style: Theme.of(context).textTheme.titleSmall
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 0.5 * SizeConfig.heightMultiplier),

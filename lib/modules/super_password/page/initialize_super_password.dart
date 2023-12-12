@@ -70,14 +70,14 @@ class _InitializeSuperPasswordState extends State<InitializeSuperPassword> {
                       padding: EdgeInsets.only(bottom: 1.5 * SizeConfig.heightMultiplier),
                       child: Text(
                         'Please Setup a Super Password',
-                        style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w500)
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)
                       ),
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 4 * SizeConfig.heightMultiplier),
                       child: Text(
                         'This super password will be used for confirmation when performing protected actions.',
-                        style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w400),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400),
                         textAlign: TextAlign.center,
                       ),
                     ),

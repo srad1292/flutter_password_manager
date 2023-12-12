@@ -76,7 +76,7 @@ class _FeatureProtectionPageState extends State<FeatureProtectionPage> {
         alignment: Alignment.center,
         child: Text(
           "When to Request Password",
-          style: Theme.of(context).textTheme.headline5,
+          style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
     );

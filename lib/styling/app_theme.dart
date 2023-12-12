@@ -31,8 +31,8 @@ class AppTheme {
     foregroundColor: Colors.white,
     centerTitle: true,
     iconTheme: barIconThemeLight,
-    toolbarTextStyle: lightTextTheme.bodyText2,
-    titleTextStyle: lightTextTheme.headline6,
+    toolbarTextStyle: lightTextTheme.bodyMedium,
+    titleTextStyle: lightTextTheme.titleLarge,
   );
 
   static AppBarTheme appBarThemeDark = AppBarTheme(
@@ -51,18 +51,18 @@ class AppTheme {
   );
 
   static TextTheme lightTextTheme = TextTheme(
-    headline6: _titleLight,
+    titleLarge: _titleLight,
     // headline4: _greetingLight,
     // headline3: _searchLight,
-    subtitle1: _subTitleLight,
-    subtitle2: _subTitle2Light,
-    bodyText2: _basicTextLight,
+    titleMedium: _subTitleLight,
+    titleSmall: _subTitle2Light,
+    bodyMedium: _basicTextLight,
     // bodyText1: _unSelectedTabLight,
     // button: _buttonLight,
   );
 
   static TextTheme darkTextTheme = TextTheme(
-    headline6: _titleDark,
+    titleLarge: _titleDark,
     // headline4: _greetingDark,
     // headline3: _searchDark,
     // subtitle2: _subTitleDark,
@@ -187,8 +187,8 @@ class AppTheme {
 
   static ElevatedButtonThemeData elevatedButtonThemeLight = ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      onPrimary: Colors.black87,
-      primary: primaryLight,
+      foregroundColor: Colors.black87,
+      backgroundColor: primaryLight,
       textStyle: TextStyle(
         color: Colors.black87,
         fontSize: 2.5 * SizeConfig.textMultiplier,

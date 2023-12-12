@@ -67,7 +67,7 @@ class _InitializationPageState extends State<InitializationPage> {
               children: [
                 Text(
                   "Password Manager",
-                  style: Theme.of(context).textTheme.headline3?.copyWith(fontWeight: FontWeight.w500),
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
                 Row(
@@ -75,7 +75,7 @@ class _InitializationPageState extends State<InitializationPage> {
                   children: [
                     Text(
                       superPasswordFailed ? "DB Connection Failed. Please Restart." : "Loading ",
-                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontWeight: FontWeight.w500),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                     superPasswordFailed ? Container() : JumpingDotsProgressIndicator(
